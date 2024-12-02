@@ -2,6 +2,7 @@
 #define __ModuleRenderExercise_H__
 
 #include "Module.h"
+#include <GL/glew.h>  
 
 class Application;
 
@@ -27,6 +28,8 @@ private:
 	unsigned vao = 0, vbo = 0;
 	unsigned shader_program = 0;
 
+public:
+	GLuint texture_object;
 	
 };
 

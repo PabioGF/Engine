@@ -62,10 +62,25 @@ update_status ModuleRenderExercise::Update()
 unsigned ModuleRenderExercise::CreateTriangleVBO() {
     // Vértices del triángulo: posición en 3D (x, y, z)
     float vertices[] = {
-        -1.0f, -1.0f, 0.0f,  // Primer vértice
-         1.0f, -1.0f, 0.0f,  // Segundo vértice
-         0.0f,  1.0f, 0.0f   // Tercer vértice
+        // Primer triángulo
+         -1.0,  -1.0f, 0.0f,  // Vértice inferior izquierdo
+         1.0f,  -1.0f, 0.0f,  // Vértice inferior derecho
+         -1.0f,  1.0f, 0.0f,  // Vértice superior izquierdo
+
+         // Segundo triángulo
+          1.0f,  -1.0f, 0.0f,  // Vértice inferior derecho
+          1.0f,  1.0f, 0.0f,  // Vértice superior derecho
+          -1.0f,  1.0f, 0.0f,   // Vértice superior izquierdo
+
+          0.0f, 1.0f,         //v0 texcoord
+          1.0f, 1.0f,         //v1 texcoord
+          0.0f, 0.0f,         //v2 texcoord
+
+          1.0f, 1.0f,         //v0 texcoord
+          1.0f, 0.0f,         //v1 texcoord
+          0.0f, 0.0f         //v2 texcoord
     };
+
 
     unsigned vbo;
     glGenBuffers(1, &vbo);
@@ -77,6 +92,7 @@ unsigned ModuleRenderExercise::CreateTriangleVBO() {
 
 void ModuleRenderExercise::RenderVBO(unsigned vbo, unsigned program) {
 
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, 0, "Mi triangulo");
     glUseProgram(shader_program);
 
     App->GetCamera()->UniformCamera();
@@ -85,7 +101,15 @@ void ModuleRenderExercise::RenderVBO(unsigned vbo, unsigned program) {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    glUseProgram(program);
-    glDrawArrays(GL_TRIANGLES, 0, 3);  
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0,(void*)(sizeof(float)*3*6));
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture_object);
+    glUniform1i(glGetUniformLocation(shader_program, "mytexture"), 0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);  
+    glPopDebugGroup();
 }
+
 

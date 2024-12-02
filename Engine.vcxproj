@@ -99,13 +99,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\SDL\include;glew-2.1.0\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\SDL\include;glew-2.1.0\include;./DirectxTex;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\glew-2.1.0\lib\Release\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\glew-2.1.0\lib\Release\x64;.\DirectXTex\DirectXTex\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);glew32.lib;opengl32.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -190,6 +190,7 @@
     <ClCompile Include="ModuleOpenGL.cpp" />
     <ClCompile Include="ModuleProgram.cpp" />
     <ClCompile Include="ModuleRenderExercise.cpp" />
+    <ClCompile Include="ModuleTexture.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="Time\Clock.cpp" />
   </ItemGroup>
@@ -198,6 +199,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="debugdraw.h" />
     <ClInclude Include="debug_draw.hpp" />
+    <ClInclude Include="DirectXTex\DirectXTex\DirectXTex\DirectXTex.h" />
     <ClInclude Include="Dummy.h" />
     <ClInclude Include="Geometry\AABB.h" />
     <ClInclude Include="Geometry\AABB2D.h" />
@@ -275,6 +277,7 @@
     <ClInclude Include="ModuleOpenGL.h" />
     <ClInclude Include="ModuleProgram.h" />
     <ClInclude Include="ModuleRenderExercise.h" />
+    <ClInclude Include="ModuleTexture.h" />
     <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="Time\Clock.h" />
   </ItemGroup>
@@ -296,6 +299,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="imgui-docking\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Textures\baboon.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
