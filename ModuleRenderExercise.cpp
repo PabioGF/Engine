@@ -5,6 +5,8 @@
 #include "ModuleRenderExercise.h"
 #include "ModuleCamera.h"
 #include "ModuleDebugDraw.h"
+#include "Model.h"
+#include "Mesh.h"
 #include "GL/glew.h"
 #include "SDL.h"
 #include "MathGeoLib.h"
@@ -29,7 +31,9 @@ bool ModuleRenderExercise::Init()
 {
     bool ret = true;
 
-    vbo = CreateTriangleVBO();
+    //vbo = CreateTriangleVBO();
+
+    model->Load("BakerHouse.gltf");
 
     ModuleProgram* program = App->GetProgram();
 
@@ -52,9 +56,9 @@ update_status ModuleRenderExercise::Update()
 {
     update_status ret = UPDATE_CONTINUE;
 
-    RenderVBO(vbo, shader_program);
-
-
+    //RenderVBO(vbo, shader_program);
+    
+    model->RenderModels(shader_program);
 
     return ret;
 }

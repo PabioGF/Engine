@@ -160,6 +160,8 @@
     <ClCompile Include="Geometry\Sphere.cpp" />
     <ClCompile Include="Geometry\Triangle.cpp" />
     <ClCompile Include="Geometry\TriangleMesh.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
     <ClCompile Include="imgui-docking\imgui_impl_opengl3.cpp" />
     <ClCompile Include="imgui-docking\imgui_impl_sdl2.cpp" />
@@ -225,6 +227,9 @@
     <ClInclude Include="Geometry\Triangle.h" />
     <ClInclude Include="Geometry\TriangleMesh.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="json.hpp" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="ModuleEditor.h" />
     <ClInclude Include="imgui-docking\imgui_impl_opengl3.h" />
     <ClInclude Include="imgui-docking\imgui_impl_opengl3_loader.h" />
@@ -280,6 +285,7 @@
     <ClInclude Include="ModuleTexture.h" />
     <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="Time\Clock.h" />
+    <ClInclude Include="tiny_gltf.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".vs\ProjectSettings.json" />

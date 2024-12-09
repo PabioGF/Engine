@@ -4,6 +4,7 @@
 #include "Module.h"
 #include "DirectXTex/DirectXTex/DirectXTex.h"
 #include <GL/glew.h>  
+#include <string>
 
 class Application;
 
@@ -22,8 +23,8 @@ public:
 	update_status Update();
 	bool CleanUp();
 	
-	DirectX::ScratchImage LoadTexture(const char* file_path);
-	GLuint CreateTexture(const DirectX::ScratchImage& scratch_image);
+	DirectX::ScratchImage LoadTexture(const std::string& file_path);
+	unsigned int CreateTexture(const DirectX::ScratchImage& scratch_image);
 
 
 

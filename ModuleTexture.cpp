@@ -28,12 +28,12 @@ ModuleTexture::~ModuleTexture() {
 bool ModuleTexture::Init()
 {
     bool ret = true;
-    DirectX::ScratchImage scratch_image = LoadTexture("baboon.jpg");
+    //DirectX::ScratchImage scratch_image = LoadTexture("baboon.jpg");
 
    
-    GLuint texture_id = CreateTexture(scratch_image);
+   // GLuint texture_id = CreateTexture(scratch_image);
 
-    App->GetExercise()->texture_object = texture_id;
+   // App->GetExercise()->texture_object = texture_id;
 
     return ret;
 }
@@ -60,10 +60,10 @@ bool ModuleTexture::CleanUp()
 }
 
 
-DirectX::ScratchImage ModuleTexture::LoadTexture(const char* file_path) {
+DirectX::ScratchImage ModuleTexture::LoadTexture(const std::string& file_path) {
     DirectX::ScratchImage image;
-
-    std::wstring wide_file_path = std::wstring(file_path, file_path + strlen(file_path));
+    LOG("File path received in LoadTexture: %s", file_path.c_str());
+    std::wstring wide_file_path(file_path.begin(), file_path.end());
 
     HRESULT hr = DirectX::LoadFromDDSFile(
         wide_file_path.c_str(),
@@ -89,7 +89,7 @@ DirectX::ScratchImage ModuleTexture::LoadTexture(const char* file_path) {
 
             if (FAILED(hr)) {
                 _com_error err(hr);
-                LOG("Failed to load texture from WIC file: %s. Error: %s", file_path, err.ErrorMessage());
+                LOG("Failed to load texture from WIC file: %s. Error: %s", file_path.c_str(), err.ErrorMessage());
                 return {};
             }
         }
@@ -100,7 +100,7 @@ DirectX::ScratchImage ModuleTexture::LoadTexture(const char* file_path) {
 
 }
 
-GLuint ModuleTexture::CreateTexture(const DirectX::ScratchImage& scratch_image) {
+unsigned int ModuleTexture::CreateTexture(const DirectX::ScratchImage& scratch_image) {
 
     DirectX::TexMetadata metadata = scratch_image.GetMetadata();
     unsigned int texture_id;
@@ -111,6 +111,8 @@ GLuint ModuleTexture::CreateTexture(const DirectX::ScratchImage& scratch_image) 
     GLint internal_format;
     GLenum format;
     GLenum type;
+
+    LOG("Texture format: %d", metadata.format);
 
     switch (metadata.format) {
     case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
@@ -133,9 +135,6 @@ GLuint ModuleTexture::CreateTexture(const DirectX::ScratchImage& scratch_image) 
     default:
         assert(false && "Unsupported format");
     }
-
-    
-   
 
     if (metadata.mipLevels <= 1) {
         // Si no hay mipmaps, generar mipmaps de la textura
