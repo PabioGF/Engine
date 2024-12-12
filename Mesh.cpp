@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "SDL.h"
 #include "MathGeoLib.h"
+#include "ModuleEditor.h"
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE 
@@ -54,8 +55,19 @@ void Mesh::Load(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const 
             float3 * ptr = reinterpret_cast<float3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
             for (size_t i = 0; i < posAcc.count; ++i)
             {
-                ptr[i] = *reinterpret_cast<const float3*>(bufferPos);
-                bufferPos += posView.byteStride;
+                float3 vertex = *reinterpret_cast<const float3*>(bufferPos);
+                ptr[i] = vertex;
+
+                vertices.push_back(vertex.x);
+                vertices.push_back(vertex.y);
+                vertices.push_back(vertex.z);
+
+                if(posView.byteStride == 0){
+                    bufferPos += sizeof(float3);
+                }else{
+                    bufferPos += posView.byteStride;
+                }
+                
 
             }
             glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -64,10 +76,18 @@ void Mesh::Load(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const 
             for (size_t i = offset; i < offset + uvsAcc.count; ++i)
             {
                 ptr2[i] = *reinterpret_cast<const float2*>(bufferUvs);
-                bufferUvs += uvsView.byteStride;
+                if (uvsView.byteStride == 0) {
+                    bufferUvs += sizeof(float2);
+                }
+                else {
+                    bufferUvs += uvsView.byteStride;
+                }
+                
 
             }
             glUnmapBuffer(GL_ARRAY_BUFFER);
+
+
 
             vertexCount = posAcc.count;
         }
@@ -142,15 +162,36 @@ void Mesh::CreateVAO()
 
 void Mesh::Draw(const std::vector<unsigned>& textures, unsigned& program)
 {
-    LOG("VERTEX: %d", vertexCount);
+
+    //LOG("Rendering mesh %d with %d indices and %d vertices", materialIndex, indexCount, vertexCount);
     glUseProgram(program);
 
     App->GetCamera()->UniformCamera();
 
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, textures[materialIndex]);
-    glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
+   // glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+
 }
+
+
+void Mesh::Clear() {
+    if (vbo != 0) {
+        glDeleteBuffers(1, &vbo);
+        vbo = 0;
+    }
+    if (ebo != 0) {
+        glDeleteBuffers(1, &ebo);
+        ebo = 0;
+    }
+    if (vao != 0) {
+        glDeleteVertexArrays(1, &vao);
+        vao = 0;
+    }
+
+    LOG("Mesh cleared.");
+}
+
 

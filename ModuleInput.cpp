@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleOpenGL.h"
+#include "ModuleRenderExercise.h"
 #include "SDL/include/SDL.h"
 
 ModuleInput::ModuleInput()
@@ -53,6 +54,15 @@ update_status ModuleInput::Update()
             case SDL_MOUSEBUTTONUP:
                 mouseState = SDL_GetMouseState(nullptr, nullptr); // Update mouse button state
                 break;
+            case SDL_DROPFILE:
+                char* droppedFilePath = sdlEvent.drop.file;
+
+                LOG("File dropped: %s", droppedFilePath);
+
+                App->GetExercise()->LoadDroppedModel(droppedFilePath);
+
+                SDL_free(droppedFilePath);
+
         }
     }
 

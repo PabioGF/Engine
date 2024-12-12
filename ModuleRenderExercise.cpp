@@ -25,6 +25,11 @@ ModuleRenderExercise::~ModuleRenderExercise() {
     if (shader_program != 0) {
         glDeleteProgram(shader_program);
     }
+
+    if (model != nullptr) {
+        model->Clear();
+        delete model;
+    }
 }
 
 bool ModuleRenderExercise::Init()
@@ -34,6 +39,10 @@ bool ModuleRenderExercise::Init()
     //vbo = CreateTriangleVBO();
 
     model->Load("BakerHouse.gltf");
+    AABB modelAABB = model->CalculateAABB();
+    App->GetCamera()->aabbModel = modelAABB;
+    //LoadDroppedModel("BakerHouse.gltf");
+    
 
     ModuleProgram* program = App->GetProgram();
 
@@ -116,4 +125,16 @@ void ModuleRenderExercise::RenderVBO(unsigned vbo, unsigned program) {
     glPopDebugGroup();
 }
 
+void ModuleRenderExercise::LoadDroppedModel(const char* droppedFilePath) {
+    if (model != nullptr) {
+        model->Clear();
+        delete model;
+    }
+
+    model = new Model();
+    model->Load(droppedFilePath);
+
+    AABB modelAABB = model->CalculateAABB();
+    App->GetCamera()->AdaptOnModel(modelAABB);
+}
 

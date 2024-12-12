@@ -44,16 +44,16 @@ update_status ModuleCamera::Update()
 
     RenderCamera();
     MoveCamera();
-
+   // LOG("frustrum pos: %d", frustum.pos);
     return ret;
 }
 
 
 
 void ModuleCamera::RenderCamera() {
-    model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
+    model = float4x4::FromTRS(float3(0.0f, 0.0f, 0.0f),
         float4x4::RotateZ(0),
-        float3(1.0f, 1.0f, 1.0f));
+        float3(1.0f, 1.0f, 1.0f)*scalefactor);
 
     SDL_GetWindowSize(App->GetWindow()->window, w, h);
 
@@ -184,7 +184,7 @@ void ModuleCamera::MoveCamera() {
        
     }
     // PANNING 
-    if (App->GetInput()->IsMouseButtonPressed(SDL_BUTTON_LEFT)&& App->GetInput()->IsKeyPressed(SDL_SCANCODE_LALT))
+    if (App->GetInput()->IsMouseButtonPressed(SDL_BUTTON_LEFT))
     {
         int mouseX = App->GetInput()->GetMouseMotionX();
         int mouseY = App->GetInput()->GetMouseMotionY();
@@ -200,8 +200,87 @@ void ModuleCamera::MoveCamera() {
         }
     }
 
+    if (App->GetInput()->IsMouseButtonPressed(SDL_BUTTON_LEFT) && App->GetInput()->IsKeyPressed(SDL_SCANCODE_LALT))
+    {
+        OrbitCamera();
+    }
+
+    if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_F))
+    {
+        LOG("HOLA");
+        AdaptOnModel(aabbModel);
+    }
 
 
+
+}
+
+void ModuleCamera::OrbitCamera() {
+    float3 target = { 0.0f, 0.0f, 0.0f }; // Punto alrededor del cual orbitar
+
+    static float yaw = 0.0f;  
+    static float pitch = 0.0f; 
+    float radius = (frustum.pos - target).Length();
+
+
+    float deltaX = App->GetInput()->GetMouseMotionX();
+    float deltaY = App->GetInput()->GetMouseMotionY();
+
+    float sensitivity = 0.005f; 
+    yaw -= deltaX * sensitivity; 
+    pitch -= deltaY * sensitivity;
+
+    // Limita el ángulo vertical para evitar voltear la cámara completamente
+    pitch = Clamp(pitch, -math::pi / 2.0f + 0.1f, math::pi / 2.0f - 0.1f);
+
+    // Calcula la nueva posición de la cámara
+    float3 newPosition;
+    newPosition.x = target.x + radius * cosf(pitch) * cosf(yaw);
+    newPosition.y = target.y + radius * sinf(pitch);
+    newPosition.z = target.z + radius * cosf(pitch) * sinf(yaw);
+
+    // Actualiza la posición de la cámara y su "look at"
+    frustum.pos = newPosition;
+    LookAt(target);
+
+}
+
+void ModuleCamera::AdaptOnModel(const AABB& aabb) {
+
+    aabbModel = aabb;
+
+    float3 center = aabb.CenterPoint();
+
+    // Calcular la mitad del tamaño de la AABB
+    float3 halfSize = aabb.HalfSize();
+
+    // Radio es la longitud de la mitad del tamaño
+    float radius = halfSize.Length() * scalefactor;
+    LOG("RADIUS: %d", radius);
+
+    // Calcular la distancia de la cámara
+    float distance = radius / tanf(frustum.verticalFov * 0.5f);
+
+    // Nuevo vector de posición para la cámara
+    float3 newPosition = center - frustum.front * (distance + focus_offset);
+
+    // Actualizar la posición de la cámara
+    frustum.pos = newPosition;
+
+    // Llamar a LookAt para hacer que la cámara mire al centro de la AABB
+    LookAt(center);
+}
+
+void ModuleCamera::LookAt(const float3& target) {
+    // Calcula el nuevo vector de dirección (front) desde la posición de la cámara al objetivo
+    frustum.front = (target - frustum.pos).Normalized();
+
+    // Calcula el nuevo vector right utilizando un vector fijo hacia arriba
+    frustum.up = float3::unitY;
+    float3 right = frustum.up.Cross(frustum.front).Normalized();
+
+    // Actualiza el vector up para que sea perpendicular al nuevo front y right
+    frustum.up = frustum.front.Cross(right).Normalized();
 }
 
 void ModuleCamera::OnWindowResize(int width, int height) {

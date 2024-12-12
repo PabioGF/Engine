@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include <vector>
+#include <string>
 #include "GL/glew.h"
 
 namespace tinygltf { // Forward declaration de las clases necesarias
@@ -17,7 +18,9 @@ public:
     unsigned vao;
     std::vector<float> vertices; 
     std::vector<unsigned int> indices; 
-    int materialIndex;    
+    int materialIndex; 
+    unsigned int vertexCount;
+    unsigned int indexCount;
 
     Mesh();
     ~Mesh();
@@ -27,11 +30,13 @@ public:
     void LoadEBO(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive);
     void CreateVAO();
     void Draw(const std::vector<unsigned>& textures, unsigned& program);
+    void Clear();
 
 private:
-    unsigned int vertexCount;
-    unsigned int indexCount;
+
     unsigned int uvsCount;
+    
+   
 };
 
 #endif 

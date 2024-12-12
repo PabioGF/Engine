@@ -12,11 +12,13 @@
 #include "imgui-docking/imgui.h"
 #include "imgui-docking/imgui_impl_opengl3.h"
 #include "imgui-docking/imgui_impl_sdl2.h"
+#include <windows.h>
+#include <psapi.h>
 
 //https://www.youtube.com/watch?v=e1i_a68CgYE
 
 ModuleEditor::ModuleEditor() {
-    
+    showWindows = true;
 }
 
 ModuleEditor::~ModuleEditor() {
@@ -45,7 +47,7 @@ update_status ModuleEditor::PreUpdate()
 update_status ModuleEditor::Update()
 {
     update_status ret = UPDATE_CONTINUE;
-    ImGui::ShowDemoWindow();
+    //ImGui::ShowDemoWindow();
     ImGui::BeginMainMenuBar();
     if (ImGui::BeginMenu("Help")) {
         if (ImGui::MenuItem("Gui Demo")){
@@ -61,24 +63,6 @@ update_status ModuleEditor::Update()
         ImGui::EndMenu();
     }
     ImGui::EndMainMenuBar();
-
-    if (ImGui::Checkbox("Fullscreen", &fullscreen)){
-        App->GetWindow()->SetFullScreen(fullscreen);
-    }
-    ImGui::SameLine();
-    if (ImGui::Checkbox("Resizable", &resizable)) {
-        App->GetWindow()->SetResizable(resizable);
-    }
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Restart to apply");
-    }
-
-    ImGui::Begin("Console");
-    for (const auto& line : logBuffer)
-    {
-        ImGui::TextUnformatted(line.c_str());
-    }
-    ImGui::End();
 
     if (show_about_window)
     {
@@ -101,6 +85,10 @@ update_status ModuleEditor::Update()
             ImGui::TextWrapped("%s", App->GetOpenGL()->license_text.c_str());
             ImGui::EndChild();
             ImGui::Separator();
+            if (ImGui::Checkbox("Show Windows", &showWindows))
+            {
+                // Acciones adicionales si es necesario
+            }
             if (ImGui::Button("Close"))
             {
                 show_about_window = false;
@@ -110,7 +98,29 @@ update_status ModuleEditor::Update()
         }
 
     }
-    FpsGraph();
+    if (showWindows) {
+
+        if (ImGui::Checkbox("Fullscreen", &fullscreen)) {
+            App->GetWindow()->SetFullScreen(fullscreen);
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("Resizable", &resizable)) {
+            App->GetWindow()->SetResizable(resizable);
+        }
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Restart to apply");
+        }
+
+        ImGui::Begin("Console");
+        for (const auto& line : logBuffer)
+        {
+            ImGui::TextUnformatted(line.c_str());
+        }
+        ImGui::End();
+        FpsGraph();
+        ShowSystemInfoWindow();
+        
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -142,9 +152,9 @@ void ModuleEditor::FpsGraph() {
     float prev_delta = delta_time;
     delta_time = clock() / CLOCKS_PER_SEC;
     fps_counter++;
-    fps = fps_counter / delta_time;
+    fps = 1000.0 / SDL_GetTicks();
     if (prev_delta != delta_time) {
-        //LOG("1 SEC: %d", fps_counter);
+        LOG("1 SEC: %d", fps_counter);
     }
 
     //float fps = 1.0f / delta_time;
@@ -157,11 +167,85 @@ void ModuleEditor::FpsGraph() {
     if (ms_log.size() > log_size)
         ms_log.erase(ms_log.begin());
 
-
-    char title[25];
-    sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
-    ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
-    sprintf_s(title, 25, "Milliseconds %0.1f", ms_log[ms_log.size() - 1]);
-    ImGui::PlotHistogram("##milliseconds", &ms_log[0], ms_log.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100));
 }
 
+void ModuleEditor::ModelInformation(const std::vector<std::string>& modelInfo, const std::vector<std::string>& textureInfo) {
+    if (showWindows) {
+        ImGui::Begin("Model Information");
+
+        ImGui::Text("Model Data:");
+        ImGui::Separator();
+
+        for (size_t i = 0; i < modelInfo.size(); ++i) {
+            ImGui::BulletText("%s", modelInfo[i].c_str());
+        }
+
+        ImGui::Spacing();
+
+
+        ImGui::Text("Texture Data:");
+        ImGui::Separator();
+
+        for (size_t i = 0; i < textureInfo.size(); ++i) {
+            ImGui::BulletText("%s", textureInfo[i].c_str());
+        }
+
+        ImGui::End();
+    }
+
+}
+
+
+void ModuleEditor::ShowSystemInfoWindow() {
+    ImGui::Begin("System Information");
+    char title[25];
+    // FPS Graph
+    ImGui::Text("Performance");
+    if (!fps_log.empty()) {
+        sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
+        ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
+    }
+    if (!ms_log.empty()) {
+        sprintf_s(title, 25, "Milliseconds %0.1f", ms_log[ms_log.size() - 1]);
+        ImGui::PlotHistogram("##milliseconds", &ms_log[0], ms_log.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100));
+    }
+
+    ImGui::Separator();
+
+    // Memory Consumption (example using dummy data, replace with actual system query)
+    ImGui::Text("Memory Consumption");
+    size_t total_memory = 0, used_memory = 0;
+    GetMemoryInfo(total_memory, used_memory);
+    ImGui::Text("Total Memory: %zu MB", total_memory);
+    ImGui::Text("Used Memory: %zu MB", used_memory);
+
+    ImGui::Separator();
+
+    // Hardware Detection
+    ImGui::Text("Hardware");
+    ImGui::Text("CPU Cores: %d", SDL_GetCPUCount());
+    ImGui::Text("RAM: %d MB", SDL_GetSystemRAM());
+    ImGui::Text("GPU: %s", (const char*)glGetString(GL_RENDERER));
+    ImGui::Text("GPU Vendor: %s", (const char*)glGetString(GL_VENDOR));
+
+    ImGui::Separator();
+
+    // Software Versions
+    ImGui::Text("Software");
+    ImGui::Text("SDL Version: %d.%d.%d", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
+    ImGui::Text("OpenGL Version: %s", (const char*)glGetString(GL_VERSION));
+    ImGui::Text("DevIL Version: %s", "1.8.0"); // Replace with actual DevIL version if necessary
+
+    ImGui::Separator();
+
+    ImGui::End();
+}
+
+void ModuleEditor::GetMemoryInfo(size_t& total_memory, size_t& used_memory) {
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    GlobalMemoryStatusEx(&memInfo);
+
+    total_memory = memInfo.ullTotalPhys; 
+    used_memory = (memInfo.ullTotalPhys - memInfo.ullAvailPhys);
+}

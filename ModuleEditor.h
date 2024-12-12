@@ -24,8 +24,12 @@ public:
 
 	void AddLog(const char* log,...);
 	void FpsGraph();
+	void ModelInformation(const std::vector<std::string>& modelInfo, const std::vector<std::string>& textureInfo);
+	void ShowSystemInfoWindow();
+	void GetMemoryInfo(size_t& total_memory, size_t& used_memory);
 
 private: 
+	bool showWindows;
 	bool show_about_window = false;
 	int fps_counter = 0;
 	float delta_time;
