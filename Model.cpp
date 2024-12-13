@@ -111,6 +111,8 @@ void Model::SaveTextureInfo(unsigned int textureId)
     glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, &magFilter);
     textureInfo.push_back("Texture Min Filter: " + std::to_string(minFilter) + ", Max Filter: " + std::to_string(magFilter));
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    App->GetEditor()->texture_id = textureId;
 }
 
 void Model::RenderModels(unsigned& program) {

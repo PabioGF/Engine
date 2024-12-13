@@ -19,10 +19,13 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 	void WindowResized(unsigned width, unsigned height);
+	void EnableParameters(bool& depth_test, bool& cull_face);
 	void* context;
 	const char* program_name;
 	const char* libraries;
 	std::string license_text;
-private:
+public:
+	bool depth_test;
+	bool cull_face;
 	
 };

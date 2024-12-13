@@ -6,6 +6,7 @@
 #include "ModuleInput.h"
 #include "ModuleOpenGL.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleCamera.h"
 #include "GL/glew.h"
 #include "SDL.h"
 #include "MathGeoLib.h"
@@ -99,26 +100,20 @@ update_status ModuleEditor::Update()
 
     }
     if (showWindows) {
-
-        if (ImGui::Checkbox("Fullscreen", &fullscreen)) {
-            App->GetWindow()->SetFullScreen(fullscreen);
-        }
-        ImGui::SameLine();
-        if (ImGui::Checkbox("Resizable", &resizable)) {
-            App->GetWindow()->SetResizable(resizable);
-        }
-        if (ImGui::IsItemHovered()) {
-            ImGui::SetTooltip("Restart to apply");
-        }
-
         ImGui::Begin("Console");
-        for (const auto& line : logBuffer)
-        {
-            ImGui::TextUnformatted(line.c_str());
+        if (logBuffer.size() != 0) {
+            for (int i = 0; i < logBuffer.size(); i++)
+            {
+                ImGui::TextUnformatted(logBuffer[i].c_str());
+            }
+            if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
+                ImGui::SetScrollHereY(1.0f);
+            }
         }
         ImGui::End();
         FpsGraph();
         ShowSystemInfoWindow();
+        ConfigurationsMenu();
         
     }
 
@@ -154,7 +149,7 @@ void ModuleEditor::FpsGraph() {
     fps_counter++;
     fps = 1000.0 / SDL_GetTicks();
     if (prev_delta != delta_time) {
-        LOG("1 SEC: %d", fps_counter);
+       // LOG("1 SEC: %d", fps_counter);
     }
 
     //float fps = 1.0f / delta_time;
@@ -182,7 +177,6 @@ void ModuleEditor::ModelInformation(const std::vector<std::string>& modelInfo, c
 
         ImGui::Spacing();
 
-
         ImGui::Text("Texture Data:");
         ImGui::Separator();
 
@@ -198,6 +192,7 @@ void ModuleEditor::ModelInformation(const std::vector<std::string>& modelInfo, c
 
 void ModuleEditor::ShowSystemInfoWindow() {
     ImGui::Begin("System Information");
+
     char title[25];
     // FPS Graph
     ImGui::Text("Performance");
@@ -248,4 +243,93 @@ void ModuleEditor::GetMemoryInfo(size_t& total_memory, size_t& used_memory) {
 
     total_memory = memInfo.ullTotalPhys; 
     used_memory = (memInfo.ullTotalPhys - memInfo.ullAvailPhys);
+}
+
+void ModuleEditor::ConfigurationsMenu() {
+    static GLint wrap_mode_s = GL_REPEAT;  
+    static GLint wrap_mode_t = GL_REPEAT;  
+    static GLint mag_filter = GL_LINEAR;
+    static GLint min_filter = GL_LINEAR;
+    static bool mipmaps_enabled = true;
+    static int window_width = App->GetWindow()->width; 
+    static int window_height = App->GetWindow()->height;
+    static int scale_factor = App->GetCamera()->scalefactor;
+    static int initial_scale = App->GetCamera()->scalefactor;
+
+    ImGui::Begin("Configuration Settings");
+
+    if (ImGui::CollapsingHeader("Window settings")) {
+        if (ImGui::Checkbox("Fullscreen", &fullscreen)) {
+            App->GetWindow()->SetFullScreen(fullscreen);
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("Resizable", &resizable)) {
+            App->GetWindow()->SetResizable(resizable);
+        }
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Restart to apply");
+        }
+        if (!resizable) {
+            ImGui::BeginDisabled(); 
+        }
+        if (ImGui::SliderInt("Width", &App->GetWindow()->width, 800, 1920)) {
+            SDL_SetWindowSize(App->GetWindow()->window, App->GetWindow()->width, App->GetWindow()->height);
+        }
+        if (ImGui::SliderInt("Height", &App->GetWindow()->height, 600, 1080)) {
+            SDL_SetWindowSize(App->GetWindow()->window, App->GetWindow()->width, App->GetWindow()->height);
+        }
+        if (!resizable) {
+            ImGui::EndDisabled(); 
+        }
+    }
+
+    if (ImGui::CollapsingHeader("OpenGL settings")) {
+        if (ImGui::Checkbox("Depth Test", &depth_test)) {
+            App->GetOpenGL()->EnableParameters(depth_test, cull_face);
+        }
+        ImGui::SameLine();
+        if (ImGui::Checkbox("Cull Face", &cull_face)) {
+            App->GetOpenGL()->EnableParameters(depth_test, cull_face);
+        }
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Restart to apply");
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Model settings")) {
+        if (ImGui::SliderInt("Scale", &scale_factor, initial_scale, initial_scale+50)) {
+            App->GetCamera()->scalefactor = scale_factor;
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Texture settings")) {
+        if (ImGui::Checkbox("Enable Mipmaps", &mipmaps_enabled)) {
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+            if (mipmaps_enabled) {
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
+        }
+
+        if (ImGui::Combo("Wrap Mode S", (int*)&wrap_mode_s, "GL_REPEAT\0GL_CLAMP_TO_EDGE\0GL_MIRRORED_REPEAT\0")) {
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_mode_s);
+        }
+        if (ImGui::Combo("Wrap Mode T", (int*)&wrap_mode_t, "GL_REPEAT\0GL_CLAMP_TO_EDGE\0GL_MIRRORED_REPEAT\0")) {
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_mode_t);
+        }
+
+        if (ImGui::Combo("Mag Filter", (int*)&mag_filter, "GL_NEAREST\0GL_LINEAR\0")) {
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
+        }
+        if (ImGui::Combo("Min Filter", (int*)&min_filter, "GL_NEAREST\0GL_LINEAR\0GL_NEAREST_MIPMAP_NEAREST\0GL_LINEAR_MIPMAP_LINEAR\0")) {
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
+        }
+    }
+
+
+
+    ImGui::End();
 }

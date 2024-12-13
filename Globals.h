@@ -2,6 +2,11 @@
 #define NOMINMAX
 #include <windows.h>
 #include <stdio.h>
+#include <vector>
+#include <string>
+
+
+extern std::vector<std::string> logBuffer;
 
 #define LOG(format, ...) engine_log(__FILE__, __LINE__, format, __VA_ARGS__);
 

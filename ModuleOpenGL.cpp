@@ -60,7 +60,6 @@ bool ModuleOpenGL::Init()
 	}
 
 	LOG("Using Glew %s", glewGetString(version));
-	App->GetEditor()->AddLog("Using Glew %s", glewGetString(version));
 	LOG("Vendor: %s", glGetString(GL_VENDOR));
 	LOG("Renderer: %s", glGetString(GL_RENDERER));
 	LOG("OpenGL version supported %s", glGetString(GL_VERSION));
@@ -100,7 +99,6 @@ update_status ModuleOpenGL::PreUpdate()
 // Called every draw update
 update_status ModuleOpenGL::Update()
 {
-
 	return UPDATE_CONTINUE;
 }
 
@@ -125,5 +123,23 @@ void ModuleOpenGL::WindowResized(unsigned width, unsigned height)
 //	SDL_SetWindowSize(App->GetWindow()->window, width, height);
 	glViewport(0, 0, width, height);
 	App->GetCamera()->OnWindowResize(width, height);
+}
+
+void ModuleOpenGL::EnableParameters(bool& depth_test, bool& cull_face) {
+	if (depth_test) {
+		glEnable(GL_DEPTH_TEST);
+	}
+	else {
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	if (cull_face) {
+		glEnable(GL_CULL_FACE);
+	}
+	else {
+		glDisable(GL_CULL_FACE);
+	}
+	
+	
 }
 

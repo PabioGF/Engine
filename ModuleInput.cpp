@@ -31,8 +31,6 @@ bool ModuleInput::Init()
 // Called every draw update
 update_status ModuleInput::Update()
 {
-    
-
     mouseMotionX = 0;
     mouseMotionY = 0;
 

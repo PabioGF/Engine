@@ -23,7 +23,6 @@ ModuleCamera::ModuleCamera() {
 
    // SDL_GetWindowSize(App->GetWindow()->window, w, h);
 
-    aspect_ratio = SCREEN_WIDTH / SCREEN_HEIGHT;
 
 }
 
@@ -34,7 +33,7 @@ ModuleCamera::~ModuleCamera() {
 bool ModuleCamera::Init()
 {
     bool ret = true;
-
+     aspect_ratio = App->GetWindow()->width / App->GetWindow()->height;
     return ret;
 }
 
@@ -51,6 +50,9 @@ update_status ModuleCamera::Update()
 
 
 void ModuleCamera::RenderCamera() {
+
+    
+
     model = float4x4::FromTRS(float3(0.0f, 0.0f, 0.0f),
         float4x4::RotateZ(0),
         float3(1.0f, 1.0f, 1.0f)*scalefactor);
@@ -65,6 +67,7 @@ void ModuleCamera::RenderCamera() {
     projection = frustum.ProjectionMatrix();
     view = frustum.ViewMatrix();
 
+    aspect_ratio = *w / *h;
     App->GetDebugDraw()->Draw(view, projection, *w, *h);
 
 
@@ -216,7 +219,8 @@ void ModuleCamera::MoveCamera() {
 }
 
 void ModuleCamera::OrbitCamera() {
-    float3 target = { 0.0f, 0.0f, 0.0f }; // Punto alrededor del cual orbitar
+    
+    float3 target = aabbModel.CenterPoint();
 
     static float yaw = 0.0f;  
     static float pitch = 0.0f; 
@@ -230,16 +234,13 @@ void ModuleCamera::OrbitCamera() {
     yaw -= deltaX * sensitivity; 
     pitch -= deltaY * sensitivity;
 
-    // Limita el ángulo vertical para evitar voltear la cámara completamente
     pitch = Clamp(pitch, -math::pi / 2.0f + 0.1f, math::pi / 2.0f - 0.1f);
 
-    // Calcula la nueva posición de la cámara
     float3 newPosition;
     newPosition.x = target.x + radius * cosf(pitch) * cosf(yaw);
     newPosition.y = target.y + radius * sinf(pitch);
     newPosition.z = target.z + radius * cosf(pitch) * sinf(yaw);
 
-    // Actualiza la posición de la cámara y su "look at"
     frustum.pos = newPosition;
     LookAt(target);
 
@@ -272,14 +273,11 @@ void ModuleCamera::AdaptOnModel(const AABB& aabb) {
 }
 
 void ModuleCamera::LookAt(const float3& target) {
-    // Calcula el nuevo vector de dirección (front) desde la posición de la cámara al objetivo
     frustum.front = (target - frustum.pos).Normalized();
 
-    // Calcula el nuevo vector right utilizando un vector fijo hacia arriba
     frustum.up = float3::unitY;
     float3 right = frustum.up.Cross(frustum.front).Normalized();
 
-    // Actualiza el vector up para que sea perpendicular al nuevo front y right
     frustum.up = frustum.front.Cross(right).Normalized();
 }
 

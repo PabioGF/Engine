@@ -27,6 +27,9 @@ public:
 	void ModelInformation(const std::vector<std::string>& modelInfo, const std::vector<std::string>& textureInfo);
 	void ShowSystemInfoWindow();
 	void GetMemoryInfo(size_t& total_memory, size_t& used_memory);
+	void ConfigurationsMenu();
+
+	unsigned int texture_id = 0;
 
 private: 
 	bool showWindows;
@@ -38,13 +41,14 @@ private:
 	bool first = TRUE;
 	float fps = 0.0f;
 
-	std::vector<std::string> logBuffer;
 	std::vector<float> fps_log; 
 	std::vector<float> ms_log;  
 	const size_t log_size = 100;
 	bool showcase = false;
 	bool fullscreen = false;
 	bool resizable = false;
+	bool depth_test = true;
+	bool cull_face = true;
 };
 
 
