@@ -58,7 +58,7 @@ update_status ModuleEditor::Update()
             showcase = !showcase;
         }
         if (ImGui::MenuItem("Documentation")) {
-            App->RequestBrowser("https://github.com/ocornut/imgui/tree/docking");
+            App->RequestBrowser("https://github.com/PabioGF");
         }
         if (ImGui::MenuItem("About...")) 
         {
@@ -107,6 +107,10 @@ update_status ModuleEditor::Update()
         if (logBuffer && !logBuffer->empty()) {
             for (const auto& log : *logBuffer) {
                 ImGui::TextUnformatted(log.c_str());
+            }
+
+            if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
+                ImGui::SetScrollHereY(1.0f);
             }
         }
         ImGui::End();

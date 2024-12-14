@@ -5,6 +5,7 @@
 #include "ModuleRenderExercise.h"
 #include "ModuleCamera.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleTexture.h"
 #include "Model.h"
 #include "Mesh.h"
 #include "GL/glew.h"
@@ -80,5 +81,13 @@ void ModuleRenderExercise::LoadDroppedModel(const char* droppedFilePath) {
 
     AABB modelAABB = model->CalculateAABB();
     App->GetCamera()->AdaptOnModel(modelAABB);
+}
+
+void ModuleRenderExercise::LoadDroppedTexture(const char* droppedFilePath) {
+    DirectX::ScratchImage scratch_image = App->GetTexture()->LoadTexture(droppedFilePath);
+    unsigned int textureId = App->GetTexture()->CreateTexture(scratch_image);
+    scratch_image.Release();
+    model->SetTexture(textureId);
+    LOG("HOLA");
 }
 

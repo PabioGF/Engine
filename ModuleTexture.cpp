@@ -112,8 +112,6 @@ unsigned int ModuleTexture::CreateTexture(const DirectX::ScratchImage& scratch_i
     GLenum format;
     GLenum type;
 
-    LOG("Texture format: %d", metadata.format);
-
     switch (metadata.format) {
     case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
     case DXGI_FORMAT_R8G8B8A8_UNORM:
@@ -162,7 +160,7 @@ unsigned int ModuleTexture::CreateTexture(const DirectX::ScratchImage& scratch_i
 
     glActiveTexture(GL_TEXTURE5);
     
-
+    LOG("Texture created succesfully");
     return texture_id;
 }
 

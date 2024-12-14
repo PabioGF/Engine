@@ -29,6 +29,7 @@ public:
     void Render(unsigned& program);  
     void LoadEBO(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive);
     void CreateVAO();
+    void SetTexture(unsigned int textureId);
     void Draw(const std::vector<unsigned>& textures, unsigned& program);
     void Clear();
 

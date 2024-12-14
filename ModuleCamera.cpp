@@ -61,9 +61,11 @@ update_status ModuleCamera::Update()
 
 void ModuleCamera::RenderCamera() {
 
-    
+    transformX = 2.0f;
+    transformY = 0.0f;
+    transformZ = 0.0f;
 
-    model = float4x4::FromTRS(float3(0.0f, 0.0f, 0.0f),
+    model = float4x4::FromTRS(float3(transformX, transformY, transformZ),
         float4x4::RotateZ(0),
         float3(1.0f, 1.0f, 1.0f)*scalefactor);
 
@@ -197,7 +199,6 @@ void ModuleCamera::MoveCamera() {
        
     }
     int mouse_wheel = App->GetInput()->GetMouseWheel();
-    LOG("Wheel: %d", mouse_wheel);
     if (mouse_wheel != 0) {
         if (mouse_wheel > 0) {
             // Scroll up (zoom in)
@@ -242,7 +243,11 @@ void ModuleCamera::MoveCamera() {
 
 void ModuleCamera::OrbitCamera() {
     
-    float3 target = aabbModel.CenterPoint();
+    float3 target;
+
+    target.x = aabbModel.CenterPoint().x + transformX;
+    target.y = aabbModel.CenterPoint().y + transformY;
+    target.z = aabbModel.CenterPoint().z + transformZ;
 
     static float yaw = 0.0f;  
     static float pitch = 0.0f; 
@@ -272,12 +277,15 @@ void ModuleCamera::AdaptOnModel(const AABB& aabb) {
 
     aabbModel = aabb;
 
-    float3 center = aabb.CenterPoint();
+    float3 center;
+
+    center.x = aabbModel.CenterPoint().x + transformX;
+    center.y = aabbModel.CenterPoint().y + transformY;
+    center.z = aabbModel.CenterPoint().z + transformZ;
 
     float3 halfSize = aabb.HalfSize();
 
     float radius = halfSize.Length() * scalefactor;
-    LOG("RADIUS: %d", radius);
 
     float distance = radius / tanf(frustum.verticalFov * 0.5f);
 

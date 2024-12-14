@@ -28,6 +28,7 @@ public:
 	void RenderModels(unsigned& program);
 	void SaveModelInfo(const int& meshIndex, Mesh* mesh);
 	void SaveTextureInfo(unsigned int textureId);
+	void SetTexture(unsigned int textureId);
 	AABB CalculateAABB() const;
 	void Clear();
 

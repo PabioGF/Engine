@@ -38,6 +38,7 @@ private:
 	float4x4 model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
 		float4x4::RotateZ(math::pi / 4.0f),
 		float3(2.0f, 1.0f, 1.0f));
+	float transformX, transformY, transformZ;
 	float4x4 projection = frustum.ProjectionMatrix();
 	float4x4 view = frustum.ViewMatrix();
 	int* w = new int(0);

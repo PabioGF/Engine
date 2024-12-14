@@ -48,11 +48,12 @@ void Model::Load(const char* assetFileName) {
 
         for (const auto& srcMesh : model.meshes) {
             for (const auto& primitive : srcMesh.primitives) {
+                cont++;
+                LOG("Mesh number %d", cont);
                 Mesh* mesh = new Mesh;
                 mesh->Load(model, srcMesh, primitive);
                 mesh->LoadEBO(model, srcMesh, primitive);
                 mesh->CreateVAO();
-                cont++;
                 SaveModelInfo(cont, mesh);
                 meshes.push_back(mesh);
 
@@ -90,7 +91,6 @@ void Model::LoadMaterials(const tinygltf::Model& srcModel) {
                 LOG("Invalid texture source index: %d", texture.source);
             }
         }
-
         textures.push_back(textureId);
         SaveTextureInfo(textureId);
     }
@@ -121,12 +121,16 @@ void Model::SaveTextureInfo(unsigned int textureId)
 void Model::RenderModels(unsigned& program) {
     std::vector<bool> processedMeshes(meshes.size(), false);
 
-   // LOG("MESEHS: %d", meshes.size());
     for (size_t i = 0; i < meshes.size(); i++) {
         meshes[i]->Draw(textures, program);
     }
 
     App->GetEditor()->ModelInformation(modelInfo, textureInfo);
+}
+
+void Model::SetTexture(unsigned int textureId) {
+    textures.clear();
+    textures.push_back(textureId);
 }
 
 void Model::SaveModelInfo(const int& meshIndex, Mesh* mesh)
@@ -171,6 +175,7 @@ void Model::Clear() {
 
     LOG("Model cleared.");
 }
+
 
 
 

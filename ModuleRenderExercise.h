@@ -22,6 +22,7 @@ public:
 	update_status Update();
 
 	void LoadDroppedModel(const char* droppedFilePath);
+	void LoadDroppedTexture(const char* droppedFilePath);
 	unsigned CreateTriangleVBO();
 	void RenderVBO(unsigned vbo, unsigned program);
 

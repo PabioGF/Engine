@@ -3,6 +3,7 @@
 #include "ModuleInput.h"
 #include "ModuleOpenGL.h"
 #include "ModuleRenderExercise.h"
+#include "ModuleTexture.h"
 #include "SDL/include/SDL.h"
 
 ModuleInput::ModuleInput()
@@ -59,10 +60,21 @@ update_status ModuleInput::Update()
                 break;
             case SDL_DROPFILE:
                 char* droppedFilePath = sdlEvent.drop.file;
-
+                std::string filePath(droppedFilePath);
                 LOG("File dropped: %s", droppedFilePath);
 
-                App->GetExercise()->LoadDroppedModel(droppedFilePath);
+                if (filePath.find(".gltf") != std::string::npos || filePath.find(".fbx") != std::string::npos) {
+                    App->GetExercise()->LoadDroppedModel(droppedFilePath);
+                }
+                else if (filePath.find(".png") != std::string::npos ||
+                    filePath.find(".jpg") != std::string::npos ||
+                    filePath.find(".dds") != std::string::npos) {
+                    App->GetExercise()->LoadDroppedTexture(droppedFilePath);
+                }
+                else {
+                    LOG("Unsupported file format: %s", droppedFilePath);
+                }
+
 
                 SDL_free(droppedFilePath);
 

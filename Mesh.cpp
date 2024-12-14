@@ -90,7 +90,10 @@ void Mesh::Load(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const 
 
 
             vertexCount = posAcc.count;
+
+            LOG("VBO loaded");
         }
+
     }
 
 }
@@ -139,6 +142,8 @@ void Mesh::LoadEBO(const tinygltf::Model& model, const tinygltf::Mesh& mesh, con
         }
         glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
         indexCount = indAcc.count;
+
+        LOG("EBO loaded");
     }
 }
 
@@ -158,7 +163,10 @@ void Mesh::CreateVAO()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * vertexCount));
 
     glBindVertexArray(0);
+
+    LOG("VAO created");
 }
+
 
 void Mesh::Draw(const std::vector<unsigned>& textures, unsigned& program)
 {
