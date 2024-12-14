@@ -130,7 +130,9 @@ void Model::RenderModels(unsigned& program) {
 
 void Model::SetTexture(unsigned int textureId) {
     textures.clear();
+    textureInfo.clear();
     textures.push_back(textureId);
+    SaveTextureInfo(textureId);
 }
 
 void Model::SaveModelInfo(const int& meshIndex, Mesh* mesh)

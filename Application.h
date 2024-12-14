@@ -26,6 +26,7 @@ public:
 	update_status Update();
 	bool CleanUp();
     void RequestBrowser(const char* url) const;
+    void RequestExit();
 
     ModuleOpenGL* GetOpenGL() { return render; }
     ModuleWindow* GetWindow() { return window; }
@@ -50,6 +51,7 @@ private:
     ModuleTexture* texture = nullptr;
 
     std::list<Module*> modules;
+    int runningState;
 
 };
 

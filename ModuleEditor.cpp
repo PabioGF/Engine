@@ -98,6 +98,11 @@ update_status ModuleEditor::Update()
                 show_about_window = false;
             }
 
+            if (ImGui::Button("Exit Application"))
+            {
+                App->RequestExit();
+            }
+
             ImGui::End();
         }
 

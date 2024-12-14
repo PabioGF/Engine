@@ -45,6 +45,9 @@ bool Application::Init()
 update_status Application::Update()
 {
 	update_status ret = UPDATE_CONTINUE;
+	if (runningState == UPDATE_STOP) {
+		ret =  UPDATE_STOP; 
+	}
 
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end() && ret == UPDATE_CONTINUE; ++it)
 		ret = (*it)->PreUpdate();
@@ -71,4 +74,8 @@ bool Application::CleanUp()
 void Application::RequestBrowser(const char* url)const
 {
 	ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
+}
+
+void Application::RequestExit() {
+	runningState = UPDATE_STOP; 
 }
