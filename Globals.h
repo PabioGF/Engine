@@ -4,13 +4,15 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include <memory>
 
 
-extern std::vector<std::string> logBuffer;
+extern std::unique_ptr<std::vector<std::string>> logBuffer;
 
 #define LOG(format, ...) engine_log(__FILE__, __LINE__, format, __VA_ARGS__);
 
 void engine_log(const char file[], int line, const char* format, ...);
+void ClearLogBuffer();
 
 enum update_status
 {

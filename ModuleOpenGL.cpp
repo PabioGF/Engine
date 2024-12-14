@@ -81,17 +81,14 @@ bool ModuleOpenGL::Init()
 
 update_status ModuleOpenGL::PreUpdate()
 {
-	int* w = new int(0);
-	int *h = new int(0);
+	int w = 0;
+	int h = 0;
 
-	SDL_GetWindowSize(App->GetWindow()->window, w, h);
-	glViewport(0, 0, *w, *h);
+	SDL_GetWindowSize(App->GetWindow()->window, &w, &h);
+	glViewport(0, 0, w, h);
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-
-	
 
 	return UPDATE_CONTINUE;
 }
@@ -123,6 +120,7 @@ void ModuleOpenGL::WindowResized(unsigned width, unsigned height)
 //	SDL_SetWindowSize(App->GetWindow()->window, width, height);
 	glViewport(0, 0, width, height);
 	App->GetCamera()->OnWindowResize(width, height);
+
 }
 
 void ModuleOpenGL::EnableParameters(bool& depth_test, bool& cull_face) {

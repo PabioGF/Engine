@@ -6723,6 +6723,7 @@ bool TinyGLTF::LoadASCIIFromFile(Model *model, std::string *err,
     if (err) {
       (*err) = ss.str();
     }
+    data.clear();
     return false;
   }
 
@@ -6739,6 +6740,8 @@ bool TinyGLTF::LoadASCIIFromFile(Model *model, std::string *err,
   bool ret = LoadASCIIFromString(
       model, err, warn, reinterpret_cast<const char *>(&data.at(0)),
       static_cast<unsigned int>(data.size()), basedir, check_sections);
+
+  data.clear();
 
   return ret;
 }

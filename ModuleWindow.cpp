@@ -22,6 +22,7 @@ bool ModuleWindow::Init()
 	{
 		LOG("SDL_VIDEO could not initialize! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
+
 	}
 	else
 	{

@@ -38,7 +38,6 @@ private:
 	std::vector<Mesh*> meshes;
 	std::vector<std::string> modelInfo;
 	std::vector<std::string> textureInfo;
-	//Mesh* new_mesh = nullptr;
 
 public:
 

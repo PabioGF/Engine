@@ -30,6 +30,8 @@ public:
 
 	Frustum frustum;
 	float scalefactor = 1.0f;
+	int windowScaleX = 1;
+	int windowScaleY = 1;
 	AABB aabbModel;
 
 private:
@@ -52,6 +54,9 @@ private:
 
 	float near_plane_distance = 0.1f;
 	float far_plane_distance = 100.0f;
+
+	int frameWidth;
+	int frameHeight;
 	
 
 };

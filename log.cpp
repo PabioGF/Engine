@@ -5,7 +5,7 @@
 #include <cstdarg>
 #include <cstdio>
 
-std::vector<std::string> logBuffer;
+std::unique_ptr<std::vector<std::string>> logBuffer = std::make_unique<std::vector<std::string>>();
 
 void engine_log(const char file[], int line, const char* format, ...)
 {
@@ -20,10 +20,19 @@ void engine_log(const char file[], int line, const char* format, ...)
 	sprintf_s(tmp_string2, 4096, "\n%s(%d) : %s", file, line, tmp_string);
 	OutputDebugString(tmp_string2);
 
-	logBuffer.emplace_back(tmp_string2);
+	logBuffer->push_back(tmp_string2);
+
+	std::memset(tmp_string, 0, sizeof(tmp_string));
+	std::memset(tmp_string2, 0, sizeof(tmp_string2));
 
 	const size_t max_logs = 500;
-	if (logBuffer.size() > max_logs) {
-		logBuffer.erase(logBuffer.begin());
+	if (logBuffer->size() > max_logs) {
+		logBuffer->erase(logBuffer->begin());
 	}
+}
+
+void ClearLogBuffer()
+{
+	logBuffer->clear();
+	logBuffer->shrink_to_fit();
 }

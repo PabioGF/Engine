@@ -4,6 +4,7 @@
 #include "Module.h"
 #include <vector>
 #include <string>
+#include <chrono>
 
 class Application;
 
@@ -39,6 +40,8 @@ private:
 	int frames = 0;
 	double starttime = 0;
 	bool first = TRUE;
+	std::chrono::time_point<std::chrono::high_resolution_clock> last_time;
+	std::chrono::time_point<std::chrono::high_resolution_clock> current_time;
 	float fps = 0.0f;
 
 	std::vector<float> fps_log; 

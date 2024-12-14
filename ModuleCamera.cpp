@@ -27,13 +27,23 @@ ModuleCamera::ModuleCamera() {
 }
 
 ModuleCamera::~ModuleCamera() {
+    if (w != nullptr) {
+        delete w;
+    }
+
+    if (h != nullptr) {
+        delete h;
+    }
+
    
+
+    App->GetDebugDraw()->CleanUp();
 }
 
 bool ModuleCamera::Init()
 {
     bool ret = true;
-     aspect_ratio = App->GetWindow()->width / App->GetWindow()->height;
+    OnWindowResize(App->GetWindow()->width, App->GetWindow()->height);
     return ret;
 }
 
@@ -67,7 +77,7 @@ void ModuleCamera::RenderCamera() {
     projection = frustum.ProjectionMatrix();
     view = frustum.ViewMatrix();
 
-    aspect_ratio = *w / *h;
+    
     App->GetDebugDraw()->Draw(view, projection, *w, *h);
 
 
@@ -252,23 +262,17 @@ void ModuleCamera::AdaptOnModel(const AABB& aabb) {
 
     float3 center = aabb.CenterPoint();
 
-    // Calcular la mitad del tamaño de la AABB
     float3 halfSize = aabb.HalfSize();
 
-    // Radio es la longitud de la mitad del tamaño
     float radius = halfSize.Length() * scalefactor;
     LOG("RADIUS: %d", radius);
 
-    // Calcular la distancia de la cámara
     float distance = radius / tanf(frustum.verticalFov * 0.5f);
 
-    // Nuevo vector de posición para la cámara
     float3 newPosition = center - frustum.front * (distance + focus_offset);
 
-    // Actualizar la posición de la cámara
     frustum.pos = newPosition;
 
-    // Llamar a LookAt para hacer que la cámara mire al centro de la AABB
     LookAt(center);
 }
 
@@ -282,7 +286,7 @@ void ModuleCamera::LookAt(const float3& target) {
 }
 
 void ModuleCamera::OnWindowResize(int width, int height) {
-    if (height == 0) height = 1; // Evitar división por cero
+    if (height == 0) height = 1; 
     aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
 
 }

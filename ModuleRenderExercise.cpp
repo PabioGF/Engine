@@ -18,10 +18,6 @@ ModuleRenderExercise::ModuleRenderExercise() {
 }
 
 ModuleRenderExercise::~ModuleRenderExercise() {
-    if (vbo != 0) {
-        glDeleteBuffers(1, &vbo);
-    }
-
     if (shader_program != 0) {
         glDeleteProgram(shader_program);
     }
@@ -72,58 +68,6 @@ update_status ModuleRenderExercise::Update()
     return ret;
 }
 
-unsigned ModuleRenderExercise::CreateTriangleVBO() {
-    // Vértices del triángulo: posición en 3D (x, y, z)
-    float vertices[] = {
-        // Primer triángulo
-         -1.0,  -1.0f, 0.0f,  // Vértice inferior izquierdo
-         1.0f,  -1.0f, 0.0f,  // Vértice inferior derecho
-         -1.0f,  1.0f, 0.0f,  // Vértice superior izquierdo
-
-         // Segundo triángulo
-          1.0f,  -1.0f, 0.0f,  // Vértice inferior derecho
-          1.0f,  1.0f, 0.0f,  // Vértice superior derecho
-          -1.0f,  1.0f, 0.0f,   // Vértice superior izquierdo
-
-          0.0f, 1.0f,         //v0 texcoord
-          1.0f, 1.0f,         //v1 texcoord
-          0.0f, 0.0f,         //v2 texcoord
-
-          1.0f, 1.0f,         //v0 texcoord
-          1.0f, 0.0f,         //v1 texcoord
-          0.0f, 0.0f         //v2 texcoord
-    };
-
-
-    unsigned vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    return vbo;
-}
-
-void ModuleRenderExercise::RenderVBO(unsigned vbo, unsigned program) {
-
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, 0, "Mi triangulo");
-    glUseProgram(shader_program);
-
-    App->GetCamera()->UniformCamera();
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0,(void*)(sizeof(float)*3*6));
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture_object);
-    glUniform1i(glGetUniformLocation(shader_program, "mytexture"), 0);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);  
-    glPopDebugGroup();
-}
 
 void ModuleRenderExercise::LoadDroppedModel(const char* droppedFilePath) {
     if (model != nullptr) {

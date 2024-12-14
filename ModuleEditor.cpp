@@ -15,6 +15,7 @@
 #include "imgui-docking/imgui_impl_sdl2.h"
 #include <windows.h>
 #include <psapi.h>
+#include <chrono>
 
 //https://www.youtube.com/watch?v=e1i_a68CgYE
 
@@ -32,6 +33,8 @@ bool ModuleEditor::Init()
     ImGui::CreateContext();
     ImGui_ImplSDL2_InitForOpenGL(App->GetWindow()->window, App->GetOpenGL()->context);
     ImGui_ImplOpenGL3_Init();
+
+    last_time = std::chrono::high_resolution_clock::now();
 
     return ret;
 }
@@ -101,13 +104,9 @@ update_status ModuleEditor::Update()
     }
     if (showWindows) {
         ImGui::Begin("Console");
-        if (logBuffer.size() != 0) {
-            for (int i = 0; i < logBuffer.size(); i++)
-            {
-                ImGui::TextUnformatted(logBuffer[i].c_str());
-            }
-            if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
-                ImGui::SetScrollHereY(1.0f);
+        if (logBuffer && !logBuffer->empty()) {
+            for (const auto& log : *logBuffer) {
+                ImGui::TextUnformatted(log.c_str());
             }
         }
         ImGui::End();
@@ -133,23 +132,13 @@ bool ModuleEditor::CleanUp()
     return true;
 }
 
-void ModuleEditor::AddLog(const char* log,...) {
-    char buf[1024];
-    va_list args;
-    va_start(args, log);
-    vsnprintf(buf, IM_ARRAYSIZE(buf), log, args);
-    buf[IM_ARRAYSIZE(buf) - 1] = 0;
-    va_end(args);
-    logBuffer.push_back(buf);
-}
-
 void ModuleEditor::FpsGraph() {
     float prev_delta = delta_time;
     delta_time = clock() / CLOCKS_PER_SEC;
     fps_counter++;
     fps = 1000.0 / SDL_GetTicks();
     if (prev_delta != delta_time) {
-       // LOG("1 SEC: %d", fps_counter);
+       LOG("1 SEC: %d", fps_counter);
     }
 
     //float fps = 1.0f / delta_time;

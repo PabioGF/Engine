@@ -27,7 +27,6 @@ public:
 
 
 private:
-	unsigned vao = 0, vbo = 0;
 	unsigned shader_program = 0;
 	Model* model = new Model();
 

@@ -37,6 +37,7 @@ void Model::Load(const char* assetFileName) {
 
     if (!gltfContext.LoadASCIIFromFile(&model, &error, &warning, assetFileName)) {
         LOG("Error loading %s: %s", assetFileName, error.c_str());
+        Clear();
         return;
     }
     else {
@@ -82,6 +83,8 @@ void Model::LoadMaterials(const tinygltf::Model& srcModel) {
 
                 DirectX::ScratchImage scratch_image = App->GetTexture()->LoadTexture(image.uri);
                 textureId = App->GetTexture()->CreateTexture(scratch_image);
+
+                scratch_image.Release();
             }
             else {
                 LOG("Invalid texture source index: %d", texture.source);
@@ -116,7 +119,7 @@ void Model::SaveTextureInfo(unsigned int textureId)
 }
 
 void Model::RenderModels(unsigned& program) {
-    static std::vector<bool> processedMeshes(meshes.size(), false);
+    std::vector<bool> processedMeshes(meshes.size(), false);
 
    // LOG("MESEHS: %d", meshes.size());
     for (size_t i = 0; i < meshes.size(); i++) {
@@ -152,6 +155,9 @@ AABB Model::CalculateAABB() const {
 }
 
 void Model::Clear() {
+    modelInfo.clear();
+    textureInfo.clear();
+
     for (Mesh* mesh : meshes) {
         mesh->Clear(); 
         delete mesh;
