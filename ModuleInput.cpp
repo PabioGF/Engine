@@ -33,6 +33,7 @@ update_status ModuleInput::Update()
 {
     mouseMotionX = 0;
     mouseMotionY = 0;
+    mouseWheel = 0;
 
     while (SDL_PollEvent(&sdlEvent) != 0)
     {
@@ -48,6 +49,10 @@ update_status ModuleInput::Update()
                 mouseMotionX = sdlEvent.motion.xrel; 
                 mouseMotionY = sdlEvent.motion.yrel; 
                 break;
+            case SDL_MOUSEWHEEL:
+                mouseWheel = sdlEvent.wheel.y;
+                break;
+
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
                 mouseState = SDL_GetMouseState(nullptr, nullptr); // Update mouse button state
@@ -86,3 +91,5 @@ bool ModuleInput::IsMouseButtonPressed(Uint8 button) const
 {
     return (mouseState & SDL_BUTTON(button)) != 0;
 }
+
+

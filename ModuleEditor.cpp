@@ -136,20 +136,22 @@ void ModuleEditor::FpsGraph() {
     float prev_delta = delta_time;
     delta_time = clock() / CLOCKS_PER_SEC;
     fps_counter++;
-    fps = 1000.0 / SDL_GetTicks();
     if (prev_delta != delta_time) {
-       LOG("1 SEC: %d", fps_counter);
+
+        fps_log.push_back(fps_counter);
+        ms_log.push_back(delta_time*1000);
+
+        fps_counter = 0;
+
+
+        if (fps_log.size() > log_size)
+            fps_log.erase(fps_log.begin());
+        if (ms_log.size() > log_size)
+            ms_log.erase(ms_log.begin());
+        
     }
 
-    //float fps = 1.0f / delta_time;
 
-    fps_log.push_back(fps);
-    ms_log.push_back(delta_time); 
-
-    if (fps_log.size() > log_size)
-        fps_log.erase(fps_log.begin());
-    if (ms_log.size() > log_size)
-        ms_log.erase(ms_log.begin());
 
 }
 
@@ -187,7 +189,7 @@ void ModuleEditor::ShowSystemInfoWindow() {
     ImGui::Text("Performance");
     if (!fps_log.empty()) {
         sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
-        ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
+        ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 2000.0f, ImVec2(310, 100));
     }
     if (!ms_log.empty()) {
         sprintf_s(title, 25, "Milliseconds %0.1f", ms_log[ms_log.size() - 1]);

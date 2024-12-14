@@ -196,6 +196,19 @@ void ModuleCamera::MoveCamera() {
         }
        
     }
+    int mouse_wheel = App->GetInput()->GetMouseWheel();
+    LOG("Wheel: %d", mouse_wheel);
+    if (mouse_wheel != 0) {
+        if (mouse_wheel > 0) {
+            // Scroll up (zoom in)
+            frustum.pos += frustum.front * zoom_speed;
+        }
+        else if (mouse_wheel < 0) {
+            // Scroll down (zoom out)
+            frustum.pos -= frustum.front * zoom_speed;
+        }
+    }
+
     // PANNING 
     if (App->GetInput()->IsMouseButtonPressed(SDL_BUTTON_LEFT))
     {
@@ -220,7 +233,6 @@ void ModuleCamera::MoveCamera() {
 
     if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_F))
     {
-        LOG("HOLA");
         AdaptOnModel(aabbModel);
     }
 

@@ -22,6 +22,7 @@ public:
 
     int GetMouseMotionX() const { return mouseMotionX; }
     int GetMouseMotionY() const { return mouseMotionY; }
+    int GetMouseWheel() const { return mouseWheel; }
 
     SDL_Event sdlEvent;
 
@@ -30,4 +31,5 @@ private:
     Uint32 mouseState = 0;
     int mouseMotionX = 0; 
     int mouseMotionY = 0; 
+    int mouseWheel = 0;
 };
