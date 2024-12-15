@@ -12,12 +12,17 @@
 #include "SDL.h"
 #include "MathGeoLib.h"
 
-//https://www.youtube.com/watch?v=e1i_a68CgYE
 
+/**
+ * Constructor for the ModuleRenderExercise class.
+ */
 ModuleRenderExercise::ModuleRenderExercise() {
 
 }
 
+/**
+ * Destructor for the ModuleRenderExercise class.
+ */
 ModuleRenderExercise::~ModuleRenderExercise() {
     if (shader_program != 0) {
         glDeleteProgram(shader_program);
@@ -29,16 +34,18 @@ ModuleRenderExercise::~ModuleRenderExercise() {
     }
 }
 
+/**
+ * Initializes the module by loading shaders and models.
+ *
+ * @return True if initialization is successful, false otherwise.
+ */
 bool ModuleRenderExercise::Init()
 {
     bool ret = true;
 
-    //vbo = CreateTriangleVBO();
-
     model->Load("BakerHouse.gltf");
     AABB modelAABB = model->CalculateAABB();
     App->GetCamera()->aabbModel = modelAABB;
-    //LoadDroppedModel("BakerHouse.gltf");
     
 
     ModuleProgram* program = App->GetProgram();
@@ -58,18 +65,25 @@ bool ModuleRenderExercise::Init()
     return ret;
 }
 
+/**
+ * Updates the RenderExercise module each frame.
+ *
+ * @return the current status of the update.
+ */
 update_status ModuleRenderExercise::Update()
 {
     update_status ret = UPDATE_CONTINUE;
-
-    //RenderVBO(vbo, shader_program);
     
     model->RenderModels(shader_program);
 
     return ret;
 }
 
-
+/**
+ * Loads a model from a file path when a file is dropped.
+ *
+ * @param droppedFilePath The path of the file that was dropped.
+ */
 void ModuleRenderExercise::LoadDroppedModel(const char* droppedFilePath) {
     if (model != nullptr) {
         model->Clear();
@@ -83,11 +97,15 @@ void ModuleRenderExercise::LoadDroppedModel(const char* droppedFilePath) {
     App->GetCamera()->AdaptOnModel(modelAABB);
 }
 
+/**
+ * Loads a texture from a file path when a file is dropped and sets it on the model.
+ *
+ * @param droppedFilePath The path of the texture file that was dropped.
+ */
 void ModuleRenderExercise::LoadDroppedTexture(const char* droppedFilePath) {
     DirectX::ScratchImage scratch_image = App->GetTexture()->LoadTexture(droppedFilePath);
     unsigned int textureId = App->GetTexture()->CreateTexture(scratch_image);
     scratch_image.Release();
     model->SetTexture(textureId);
-    LOG("HOLA");
 }
 

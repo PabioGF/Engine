@@ -13,22 +13,45 @@
 #include "ModuleEditor.h"
 #include "MathGeoLib.h"
 
+
+/**
+ * Constructor for the Model class.
+ */
 Model::Model() {}
 
+/**
+ * Destructor for the Model class.
+ * Frees all allocated meshes.
+ */
 Model::~Model() {
     for (Mesh* mesh : meshes) {
         delete mesh;
     }
 }
 
+/**
+ * Initializes the model.
+ *
+ * @return true if initialization is successful.
+ */
 bool Model::Init() {
     return true;
 }
 
+/**
+ * Updates the model during the application's update loop.
+ *
+ * @return The update status.
+ */
 update_status Model::Update() {
     return UPDATE_CONTINUE;
 }
 
+/**
+ * Loads a GLTF model from a file.
+ *
+ * @param assetFileName The path to the GLTF file.
+ */
 void Model::Load(const char* assetFileName) {
     tinygltf::TinyGLTF gltfContext;
     tinygltf::Model model;
@@ -72,6 +95,11 @@ void Model::Load(const char* assetFileName) {
 
 }
 
+/**
+ * Loads the textures of the model.
+ *
+ * @param srcModel The GLTF model containing the materials.
+ */
 void Model::LoadMaterials(const tinygltf::Model& srcModel) {
     for (const auto& srcMaterial : srcModel.materials) {
         unsigned int textureId = 0;
@@ -80,7 +108,6 @@ void Model::LoadMaterials(const tinygltf::Model& srcModel) {
             const tinygltf::Texture& texture = srcModel.textures[srcMaterial.pbrMetallicRoughness.baseColorTexture.index];
             if (texture.source >= 0 && texture.source < srcModel.images.size()) {
                 const tinygltf::Image& image = srcModel.images[texture.source];
-                //LOG("Loading texture: %s", image.uri.c_str());
 
                 DirectX::ScratchImage scratch_image = App->GetTexture()->LoadTexture(image.uri);
                 textureId = App->GetTexture()->CreateTexture(scratch_image);
@@ -96,6 +123,11 @@ void Model::LoadMaterials(const tinygltf::Model& srcModel) {
     }
 }
 
+/**
+ * Saves texture information for showing in the UI.
+ *
+ * @param textureId The texture ID.
+ */
 void Model::SaveTextureInfo(unsigned int textureId)
 {
     int width, height;
@@ -118,8 +150,12 @@ void Model::SaveTextureInfo(unsigned int textureId)
     App->GetEditor()->texture_id = textureId;
 }
 
+/**
+ * Renders all the meshes in the model using the provided shader program.
+ *
+ * @param program The OpenGL shader program ID.
+ */
 void Model::RenderModels(unsigned& program) {
-    std::vector<bool> processedMeshes(meshes.size(), false);
 
     for (size_t i = 0; i < meshes.size(); i++) {
         meshes[i]->Draw(textures, program);
@@ -128,6 +164,11 @@ void Model::RenderModels(unsigned& program) {
     App->GetEditor()->ModelInformation(modelInfo, textureInfo);
 }
 
+/**
+ * Sets a new texture for the model.
+ *
+ * @param textureId The new texture ID.
+ */
 void Model::SetTexture(unsigned int textureId) {
     textures.clear();
     textureInfo.clear();
@@ -135,6 +176,12 @@ void Model::SetTexture(unsigned int textureId) {
     SaveTextureInfo(textureId);
 }
 
+/**
+ * Saves information about a mesh for showing in the UI.
+ *
+ * @param meshIndex The index of the mesh.
+ * @param mesh The mesh object.
+ */
 void Model::SaveModelInfo(const int& meshIndex, Mesh* mesh)
 {
     modelInfo.push_back("Mesh Index: " + std::to_string(meshIndex));
@@ -143,6 +190,11 @@ void Model::SaveModelInfo(const int& meshIndex, Mesh* mesh)
 
 }
 
+/**
+ * Calculates the Axis-Aligned Bounding Box (AABB) for the model.
+ *
+ * @return The calculated AABB.
+ */
 AABB Model::CalculateAABB() const {
     AABB aabb;
     aabb.SetNegativeInfinity(); 
@@ -160,6 +212,9 @@ AABB Model::CalculateAABB() const {
     return aabb;
 }
 
+/**
+ * Clears the model, releasing all allocated resources.
+ */
 void Model::Clear() {
     modelInfo.clear();
     textureInfo.clear();

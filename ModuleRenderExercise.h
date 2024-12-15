@@ -23,16 +23,12 @@ public:
 
 	void LoadDroppedModel(const char* droppedFilePath);
 	void LoadDroppedTexture(const char* droppedFilePath);
-	unsigned CreateTriangleVBO();
-	void RenderVBO(unsigned vbo, unsigned program);
 
 
 private:
 	unsigned shader_program = 0;
 	Model* model = new Model();
 
-public:
-	GLuint texture_object;
 	
 };
 

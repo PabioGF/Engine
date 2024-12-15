@@ -10,25 +10,37 @@
 #define TINYGLTF_NO_EXTERNAL_IMAGE 
 #include "tiny_gltf.h"
 
-
+/**
+ * Constructor for the Mesh class.
+ */
 Mesh::Mesh(){
 
 }
 
+/**
+ * Destructor for the Mesh class.
+ */
 Mesh::~Mesh() {
 
 }
 
+/**
+ * Loads vertex and texture coordinate data into the mesh.
+ *
+ * @param model Reference to the GLTF model.
+ * @param mesh The mesh data from the GLTF file.
+ * @param primitive The primitive data within the mesh.
+ */
 void Mesh::Load(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive){
     const auto& itPos = primitive.attributes.find("POSITION");
-    if (itPos != primitive.attributes.end())//significa que el atributo "POSITION" existe en el primitive.
+    if (itPos != primitive.attributes.end())
     {
-        const tinygltf::Accessor& posAcc = model.accessors[itPos->second];//itPos->second obtiene el índice del accessor asociado al atributo "POSITION"/ model.accessors es un vector que contiene todos los accessors del modelo. / posAcc ahora es una referencia al accessor que contiene la descripción de las posiciones de los vértices.
-        SDL_assert(posAcc.type == TINYGLTF_TYPE_VEC3);//Asegura que cada posición de vértice es un vector de 3 componentes (x, y, z).
-        SDL_assert(posAcc.componentType == GL_FLOAT);//Asegura que los datos de las posiciones están almacenados como flotantes.
-        const tinygltf::BufferView& posView = model.bufferViews[posAcc.bufferView]; //Accede al BufferView asociado al Accessor
-        const tinygltf::Buffer& posBuffer = model.buffers[posView.buffer]; //Acceder al Buffer asociado al BufferView
-        const unsigned char* bufferPos = &(posBuffer.data[posAcc.byteOffset + posView.byteOffset]); //Obtiene los datos de posición de los vértices
+        const tinygltf::Accessor& posAcc = model.accessors[itPos->second];
+        SDL_assert(posAcc.type == TINYGLTF_TYPE_VEC3);
+        SDL_assert(posAcc.componentType == GL_FLOAT);
+        const tinygltf::BufferView& posView = model.bufferViews[posAcc.bufferView]; 
+        const tinygltf::Buffer& posBuffer = model.buffers[posView.buffer];
+        const unsigned char* bufferPos = &(posBuffer.data[posAcc.byteOffset + posView.byteOffset]); 
 
         const auto& itTex = primitive.attributes.find("TEXCOORD_0");
         if (itTex != primitive.attributes.end())
@@ -50,7 +62,7 @@ void Mesh::Load(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const 
 
 
             glGenBuffers(1, &vbo);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);//NO ESTA EN EL POWER PERO SI LO QUITO PETA.
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
             glBufferData(GL_ARRAY_BUFFER, ((sizeof(float) * 3 * posAcc.count) + (sizeof(float) * 2 * uvsAcc.count)), nullptr, GL_STATIC_DRAW);
             float3 * ptr = reinterpret_cast<float3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
             for (size_t i = 0; i < posAcc.count; ++i)
@@ -98,6 +110,13 @@ void Mesh::Load(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const 
 
 }
 
+/**
+ * Loads index data into the Element Buffer Object (EBO).
+ *
+ * @param model Reference to the GLTF model.
+ * @param mesh The mesh data from the GLTF file.
+ * @param primitive The primitive data within the mesh.
+ */
 void Mesh::LoadEBO(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive)
 {
     if (primitive.indices >= 0)
@@ -148,11 +167,11 @@ void Mesh::LoadEBO(const tinygltf::Model& model, const tinygltf::Mesh& mesh, con
 }
 
 
-
+/**
+ * Creates the Vertex Array Object (VAO).
+ */
 void Mesh::CreateVAO()
 {
-   // vertexCount = vertices.size() / 3;
-    
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -167,24 +186,29 @@ void Mesh::CreateVAO()
     LOG("VAO created");
 }
 
-
+/**
+ * Draws the mesh.
+ *
+ * @param textures The textures associated with the mesh.
+ * @param program The shader program to use.
+ */
 void Mesh::Draw(const std::vector<unsigned>& textures, unsigned& program)
 {
 
-    //LOG("Rendering mesh %d with %d indices and %d vertices", materialIndex, indexCount, vertexCount);
     glUseProgram(program);
 
     App->GetCamera()->UniformCamera();
 
     glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, textures[materialIndex]);
-   // glUniform1i(glGetUniformLocation(program, "mytexture"), 0);
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 
 }
 
-
+/**
+ * Clears the mesh data.
+ */
 void Mesh::Clear() {
     if (vbo != 0) {
         glDeleteBuffers(1, &vbo);

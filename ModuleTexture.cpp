@@ -15,51 +15,27 @@
 #include <comdef.h>
 
 
-//https://www.youtube.com/watch?v=e1i_a68CgYE
 
+/**
+ * Constructor for the ModuleTexture class.
+ */
 ModuleTexture::ModuleTexture() {
 
 }
 
+/**
+ * Destructor for the ModuleTexture class.
+ */
 ModuleTexture::~ModuleTexture() {
 
 }
 
-bool ModuleTexture::Init()
-{
-    bool ret = true;
-    //DirectX::ScratchImage scratch_image = LoadTexture("baboon.jpg");
-
-   
-   // GLuint texture_id = CreateTexture(scratch_image);
-
-   // App->GetExercise()->texture_object = texture_id;
-
-    return ret;
-}
-
-update_status ModuleTexture::PreUpdate()
-{
-    update_status ret = UPDATE_CONTINUE;
-
-    return ret;
-}
-
-update_status ModuleTexture::Update()
-{
-    update_status ret = UPDATE_CONTINUE;
-
-    return ret;
-}
-
-
-bool ModuleTexture::CleanUp()
-{
-
-    return true;
-}
-
-
+/**
+ * Loads a texture from a file path using DirectXTex.
+ *
+ * @param file_path The path of the texture file to be loaded.
+ * @return A ScratchImage containing the loaded texture.
+ */
 DirectX::ScratchImage ModuleTexture::LoadTexture(const std::string& file_path) {
     DirectX::ScratchImage image;
     LOG("File path received in LoadTexture: %s", file_path.c_str());
@@ -100,6 +76,12 @@ DirectX::ScratchImage ModuleTexture::LoadTexture(const std::string& file_path) {
 
 }
 
+/**
+ * Creates an OpenGL texture from a DirectX ScratchImage.
+ *
+ * @param scratch_image The ScratchImage object containing the texture data.
+ * @return The ID of the created OpenGL texture.
+ */
 unsigned int ModuleTexture::CreateTexture(const DirectX::ScratchImage& scratch_image) {
 
     DirectX::TexMetadata metadata = scratch_image.GetMetadata();
@@ -135,7 +117,6 @@ unsigned int ModuleTexture::CreateTexture(const DirectX::ScratchImage& scratch_i
     }
 
     if (metadata.mipLevels <= 1) {
-        // Si no hay mipmaps, generar mipmaps de la textura
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);

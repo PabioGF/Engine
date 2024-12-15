@@ -13,16 +13,26 @@
 
 const char version = 2.0;
 
-
+/**
+ * Constructor for the ModuleOpenGL class.
+ */
 ModuleOpenGL::ModuleOpenGL()
 {
 }
 
-// Destructor
+/**
+ * Destructor for the ModuleOpenGL class.
+ */
 ModuleOpenGL::~ModuleOpenGL()
 {
 }
 
+/**
+ * Loads the license text from a file.
+ *
+ * @param file_path The file path to the license file.
+ * @return The content of the license file as a string.
+ */
 std::string LoadLicense(const std::string& file_path)
 {
 	std::ifstream file(file_path);
@@ -37,7 +47,11 @@ std::string LoadLicense(const std::string& file_path)
 	return buffer.str();
 }
 
-// Called before render is available
+/**
+ * Initializes the OpenGL module.
+ *
+ * @return true if initialization was successful.
+ */
 bool ModuleOpenGL::Init()
 {
 	glEnable(GL_CULL_FACE);
@@ -70,7 +84,7 @@ bool ModuleOpenGL::Init()
 
 	program_name = PROGRAM_NAME;
 	libraries = LIBRARIES;
-	license_text = LoadLicense("imgui-docking/LICENSE.txt");
+	license_text = LoadLicense("LICENCE.txt");
 	
 
 
@@ -79,6 +93,11 @@ bool ModuleOpenGL::Init()
 	return true;
 }
 
+/**
+ * Prepares for updates in each frame.
+ *
+ * @return UPDATE_CONTINUE to continue updating.
+ */
 update_status ModuleOpenGL::PreUpdate()
 {
 	int w = 0;
@@ -93,36 +112,58 @@ update_status ModuleOpenGL::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
-// Called every draw update
+/**
+ * Updates the OpenGL module each frame.
+ *
+ * @return the current status of the update.
+ */
 update_status ModuleOpenGL::Update()
 {
 	return UPDATE_CONTINUE;
 }
 
+/**
+ * Swaps the OpenGL window.
+ *
+ * @return the current status of the update.
+ */
 update_status ModuleOpenGL::PostUpdate()
 {
 	SDL_GL_SwapWindow(App->GetWindow()->window);
 	return UPDATE_CONTINUE;
 }
 
-// Called before quitting
+/**
+ * Cleans up the OpenGL module.
+ *
+ * @return true if cleanup was successful.
+ */
 bool ModuleOpenGL::CleanUp()
 {
 	LOG("Destroying renderer");
 	SDL_GL_DeleteContext(context);
-	//Destroy window
 
 	return true;
 }
 
+/**
+ * Handles window resizing.
+ *
+ * @param width The new width of the window.
+ * @param height The new height of the window.
+ */
 void ModuleOpenGL::WindowResized(unsigned width, unsigned height)
 {
-//	SDL_SetWindowSize(App->GetWindow()->window, width, height);
 	glViewport(0, 0, width, height);
 	App->GetCamera()->OnWindowResize(width, height);
-
 }
 
+/**
+ * Enables or disables depth test and cull face in OpenGL.
+ *
+ * @param depth_test The state of the depth test.
+ * @param cull_face The state of the cull face.
+ */
 void ModuleOpenGL::EnableParameters(bool& depth_test, bool& cull_face) {
 	if (depth_test) {
 		glEnable(GL_DEPTH_TEST);

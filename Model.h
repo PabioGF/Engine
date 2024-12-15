@@ -33,8 +33,6 @@ public:
 	void Clear();
 
 private:
-	unsigned vao = 0, vbo = 0;
-	unsigned shader_program = 0;
 	std::vector<unsigned> textures;
 	std::vector<Mesh*> meshes;
 	std::vector<std::string> modelInfo;

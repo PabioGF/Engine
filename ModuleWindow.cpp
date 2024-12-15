@@ -2,16 +2,25 @@
 #include "Application.h"
 #include "ModuleWindow.h"
 
+/**
+ * Constructor for the ModuleWindow class.
+ */
 ModuleWindow::ModuleWindow()
 {
 }
 
-// Destructor
+/**
+ * Destructor for the ModuleWindow class.
+ */
 ModuleWindow::~ModuleWindow()
 {
 }
 
-// Called before render is available
+/**
+ * Initializes the SDL window and surface.
+ *
+ * @return True if initialization is successful, false otherwise.
+ */
 bool ModuleWindow::Init()
 {
 	SDL_WINDOW_OPENGL;
@@ -51,8 +60,6 @@ bool ModuleWindow::Init()
 		}
 		else
 		{
-			//Get window surface
-			
 			screen_surface = SDL_GetWindowSurface(window);
 		}
 	}
@@ -60,7 +67,11 @@ bool ModuleWindow::Init()
 	return ret;
 }
 
-// Called before quitting
+/**
+ * Cleans up the SDL window by destroying it and quitting all SDL systems.
+ *
+ * @return True if cleanup is successful, false otherwise.
+ */
 bool ModuleWindow::CleanUp()
 {
 	LOG("Destroying SDL window and quitting all SDL systems");
@@ -76,6 +87,11 @@ bool ModuleWindow::CleanUp()
 	return true;
 }
 
+/**
+ * Sets the window to fullscreen mode.
+ *
+ * @param fullscreen True to enable fullscreen, false to disable it.
+ */
 void ModuleWindow::SetFullScreen(bool fullscreen) {
 	LOG("FULL SCREEN");
 	if (fullscreen)
@@ -88,7 +104,11 @@ void ModuleWindow::SetFullScreen(bool fullscreen) {
 	}
 }
 
-
+/**
+ * Sets the window to be resizable.
+ *
+ * @param resizable True to make the window resizable, false otherwise.
+ */
 void ModuleWindow::SetResizable(bool resizable) {
 	LOG("RESIZABLE SCREEN");
 	if (resizable)

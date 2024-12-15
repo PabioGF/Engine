@@ -9,8 +9,10 @@
 #include "SDL.h"
 #include "MathGeoLib.h"
 
-//https://www.youtube.com/watch?v=e1i_a68CgYE
 
+/**
+ * Constructor for the ModuleCamera class. Initializes the frustum and sets default values.
+ */
 ModuleCamera::ModuleCamera() {
     frustum.type = FrustumType::PerspectiveFrustum;
 
@@ -20,12 +22,11 @@ ModuleCamera::ModuleCamera() {
 
     speed_base = movement_speed;
 
-
-   // SDL_GetWindowSize(App->GetWindow()->window, w, h);
-
-
 }
 
+/**
+ * Destructor for the ModuleCamera class. Cleans up any allocated resources.
+ */
 ModuleCamera::~ModuleCamera() {
     if (w != nullptr) {
         delete w;
@@ -35,11 +36,14 @@ ModuleCamera::~ModuleCamera() {
         delete h;
     }
 
-   
-
     App->GetDebugDraw()->CleanUp();
 }
 
+/**
+ * Initializes the camera module.
+ *
+ * @return true if initialization was successful.
+ */
 bool ModuleCamera::Init()
 {
     bool ret = true;
@@ -47,18 +51,25 @@ bool ModuleCamera::Init()
     return ret;
 }
 
+/**
+ * Updates the camera module each frame.
+ *
+ * @return The current update status.
+ */
 update_status ModuleCamera::Update()
 {
     update_status ret = UPDATE_CONTINUE;
 
     RenderCamera();
     MoveCamera();
-   // LOG("frustrum pos: %d", frustum.pos);
+
     return ret;
 }
 
 
-
+/**
+ * Renders the camera by calculating the projection and view matrices.
+ */
 void ModuleCamera::RenderCamera() {
 
     transformX = 2.0f;
@@ -85,15 +96,21 @@ void ModuleCamera::RenderCamera() {
 
 }
 
+/**
+ * Sends the camera's matrices to the GPU as uniforms.
+ */
 void ModuleCamera::UniformCamera() {
     glUniformMatrix4fv(0, 1, GL_TRUE, &projection[0][0]);
     glUniformMatrix4fv(1, 1, GL_TRUE, &view[0][0]);
     glUniformMatrix4fv(2, 1, GL_TRUE, &model[0][0]);
 }
 
+/**
+ * Handles camera movement based on user input.
+ */
 void ModuleCamera::MoveCamera() {
 
-    
+    //INCREASES SPEED
     if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_LSHIFT))
     {
         movement_speed = speed_base * 3;
@@ -102,32 +119,35 @@ void ModuleCamera::MoveCamera() {
         movement_speed = speed_base;
     }
 
-    //TRANSLATION
-    if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_W))
+    if (App->GetInput()->IsMouseButtonPressed(SDL_BUTTON_RIGHT))
     {
-        frustum.pos += frustum.front * movement_speed;
-    }
-    if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_S))
-    {
-        frustum.pos -= frustum.front * movement_speed;
-    }
+        //TRANSLATION
+        if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_W))
+        {
+            frustum.pos += frustum.front * movement_speed;
+        }
+        if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_S))
+        {
+            frustum.pos -= frustum.front * movement_speed;
+        }
 
-    if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_A))
-    {
-        frustum.pos -= frustum.WorldRight() * movement_speed;
-    }
-    if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_D))
-    {
-        frustum.pos += frustum.WorldRight() * movement_speed;
-    }
+        if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_A))
+        {
+            frustum.pos -= frustum.WorldRight() * movement_speed;
+        }
+        if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_D))
+        {
+            frustum.pos += frustum.WorldRight() * movement_speed;
+        }
 
-    if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_E))
-    {
-        frustum.pos += frustum.up * movement_speed;
-    }
-    if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_Q))
-    {
-        frustum.pos -= frustum.up * movement_speed;
+        if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_E))
+        {
+            frustum.pos += frustum.up * movement_speed;
+        }
+        if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_Q))
+        {
+            frustum.pos -= frustum.up * movement_speed;
+        }
     }
 
     //ROTATION
@@ -175,7 +195,7 @@ void ModuleCamera::MoveCamera() {
         
         }
         else {
-            // ROTATION (Mouse motion)
+            // ROTATION WITH MOUSE
             int mouseX = App->GetInput()->GetMouseMotionX();
             int mouseY = App->GetInput()->GetMouseMotionY();
 
@@ -198,14 +218,14 @@ void ModuleCamera::MoveCamera() {
         }
        
     }
+
+    //ZOOM WITH MOUSE SCROLL
     int mouse_wheel = App->GetInput()->GetMouseWheel();
     if (mouse_wheel != 0) {
         if (mouse_wheel > 0) {
-            // Scroll up (zoom in)
             frustum.pos += frustum.front * zoom_speed;
         }
         else if (mouse_wheel < 0) {
-            // Scroll down (zoom out)
             frustum.pos -= frustum.front * zoom_speed;
         }
     }
@@ -227,11 +247,13 @@ void ModuleCamera::MoveCamera() {
         }
     }
 
+    //ORBIT
     if (App->GetInput()->IsMouseButtonPressed(SDL_BUTTON_LEFT) && App->GetInput()->IsKeyPressed(SDL_SCANCODE_LALT))
     {
         OrbitCamera();
     }
 
+    //FOCUS ON MODEL
     if (App->GetInput()->IsKeyPressed(SDL_SCANCODE_F))
     {
         AdaptOnModel(aabbModel);
@@ -241,6 +263,9 @@ void ModuleCamera::MoveCamera() {
 
 }
 
+/**
+ * Orbits the camera around the model.
+ */
 void ModuleCamera::OrbitCamera() {
     
     float3 target;
@@ -261,7 +286,7 @@ void ModuleCamera::OrbitCamera() {
     yaw -= deltaX * sensitivity; 
     pitch -= deltaY * sensitivity;
 
-    pitch = Clamp(pitch, -math::pi / 2.0f + 0.1f, math::pi / 2.0f - 0.1f);
+    pitch = Clamp(pitch, -math::pi/2.0f + 0.1f, math::pi/2.0f - 0.1f);
 
     float3 newPosition;
     newPosition.x = target.x + radius * cosf(pitch) * cosf(yaw);
@@ -273,6 +298,11 @@ void ModuleCamera::OrbitCamera() {
 
 }
 
+/**
+ * Adapts the camera's position and focus to the model using his AABB.
+ *
+ * @param aabb The Axis-Aligned Bounding Box to adapt to.
+ */
 void ModuleCamera::AdaptOnModel(const AABB& aabb) {
 
     aabbModel = aabb;
@@ -296,6 +326,11 @@ void ModuleCamera::AdaptOnModel(const AABB& aabb) {
     LookAt(center);
 }
 
+/**
+ * Makes the camera look at a target point.
+ *
+ * @param target The target point to look at.
+ */
 void ModuleCamera::LookAt(const float3& target) {
     frustum.front = (target - frustum.pos).Normalized();
 
@@ -305,6 +340,12 @@ void ModuleCamera::LookAt(const float3& target) {
     frustum.up = frustum.front.Cross(right).Normalized();
 }
 
+/**
+ * Updates the camera's aspect ratio when the window is resized.
+ *
+ * @param width The new width of the window.
+ * @param height The new height of the window.
+ */
 void ModuleCamera::OnWindowResize(int width, int height) {
     if (height == 0) height = 1; 
     aspect_ratio = static_cast<float>(width) / static_cast<float>(height);

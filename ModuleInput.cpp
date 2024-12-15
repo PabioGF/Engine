@@ -6,14 +6,23 @@
 #include "ModuleTexture.h"
 #include "SDL/include/SDL.h"
 
+/**
+ * Constructor for the ModuleInput class.
+ */
 ModuleInput::ModuleInput()
 {}
 
-// Destructor
+/**
+ * Destructor for the ModuleInput class.
+ */
 ModuleInput::~ModuleInput()
 {}
 
-// Called before render is available
+/**
+ * Initializes the Input Module.
+ *
+ * @return true if initialization was successful.
+ */
 bool ModuleInput::Init()
 {
 	LOG("Init SDL input event system");
@@ -29,7 +38,11 @@ bool ModuleInput::Init()
 	return ret;
 }
 
-// Called every draw update
+/**
+ * Updates the input module each frame.
+ *
+ * @return The current update status.
+ */
 update_status ModuleInput::Update()
 {
     mouseMotionX = 0;
@@ -56,9 +69,10 @@ update_status ModuleInput::Update()
 
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
-                mouseState = SDL_GetMouseState(nullptr, nullptr); // Update mouse button state
+                mouseState = SDL_GetMouseState(nullptr, nullptr); 
                 break;
             case SDL_DROPFILE:
+                //WE CHECK IF IS A MODEL OR A TEXTURE
                 char* droppedFilePath = sdlEvent.drop.file;
                 std::string filePath(droppedFilePath);
                 LOG("File dropped: %s", droppedFilePath);
@@ -86,12 +100,22 @@ update_status ModuleInput::Update()
     return UPDATE_CONTINUE;
 }
 
+/**
+ * Checks if a specific key is pressed.
+ *
+ * @param key The SDL_Scancode of the key.
+ * @return true if the key is pressed, false otherwise.
+ */
 bool ModuleInput::IsKeyPressed(SDL_Scancode key) const
 {
     return keyboard[key] != 0;
 }
 
-// Called before quitting
+/**
+ * Cleans the Input Module
+ *
+ * @return true if cleanup was successful.
+ */
 bool ModuleInput::CleanUp()
 {
 	LOG("Quitting SDL input event subsystem");
@@ -99,6 +123,12 @@ bool ModuleInput::CleanUp()
 	return true;
 }
 
+/**
+ * Checks if a specific mouse button is pressed.
+ *
+ * @param button The SDL button identifier.
+ * @return true if the mouse button is pressed, false otherwise.
+ */
 bool ModuleInput::IsMouseButtonPressed(Uint8 button) const
 {
     return (mouseState & SDL_BUTTON(button)) != 0;

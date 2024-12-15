@@ -10,6 +10,10 @@
 #include "ModuleTexture.h"
 using namespace std;
 
+/**
+ * Application Constructor
+ * Initializes and orders the modules of the engine.
+ */
 Application::Application()
 {
 	// Order matters: they will Init/start/update in this order
@@ -24,6 +28,10 @@ Application::Application()
 
 }
 
+/**
+ * Application Destructor
+ * Deletes all the modules in reverse order to ensure proper cleanup.
+ */
 Application::~Application()
 {
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end(); ++it)
@@ -32,6 +40,11 @@ Application::~Application()
     }
 }
 
+/**
+ * Initializes all modules of the application.
+ *
+ * @return true if all modules initialized successfully, false otherwise.
+ */
 bool Application::Init()
 {
 	bool ret = true;
@@ -42,6 +55,12 @@ bool Application::Init()
 	return ret;
 }
 
+/**
+ * Updates all modules in the application.
+ * Executes the PreUpdate, Update, and PostUpdate cycles for each module.
+ *
+ * @return the update status of the application (UPDATE_CONTINUE, UPDATE_STOP, or UPDATE_ERROR).
+ */
 update_status Application::Update()
 {
 	update_status ret = UPDATE_CONTINUE;
@@ -61,6 +80,11 @@ update_status Application::Update()
 	return ret;
 }
 
+/**
+ * Cleans up all modules of the application.
+ *
+ * @return true if all modules cleaned up successfully, false otherwise.
+ */
 bool Application::CleanUp()
 {
 	bool ret = true;
@@ -71,11 +95,19 @@ bool Application::CleanUp()
 	return ret;
 }
 
+/**
+ * Opens the browser with the specified URL.
+ *
+ * @param url the URL to open in the browser.
+ */
 void Application::RequestBrowser(const char* url)const
 {
 	ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
 }
 
+/**
+ * Requests to exit the application by setting the running state to UPDATE_STOP.
+ */
 void Application::RequestExit() {
 	runningState = UPDATE_STOP; 
 }

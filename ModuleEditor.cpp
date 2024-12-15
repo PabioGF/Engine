@@ -17,16 +17,26 @@
 #include <psapi.h>
 #include <chrono>
 
-//https://www.youtube.com/watch?v=e1i_a68CgYE
 
+/**
+ * Constructor for the ModuleEditor class. 
+ */
 ModuleEditor::ModuleEditor() {
     showWindows = true;
 }
 
+/**
+ * Destructor for the ModuleEditor class.
+ */
 ModuleEditor::~ModuleEditor() {
 
 }
 
+/**
+ * Initializes the editor module.
+ *
+ * @return true if initialization was successful.
+ */
 bool ModuleEditor::Init()
 {
     bool ret = true;
@@ -34,11 +44,14 @@ bool ModuleEditor::Init()
     ImGui_ImplSDL2_InitForOpenGL(App->GetWindow()->window, App->GetOpenGL()->context);
     ImGui_ImplOpenGL3_Init();
 
-    last_time = std::chrono::high_resolution_clock::now();
-
     return ret;
 }
 
+/**
+ * Prepares for updates in each frame.
+ *
+ * @return UPDATE_CONTINUE to continue updating.
+ */
 update_status ModuleEditor::PreUpdate()
 {
     update_status ret = UPDATE_CONTINUE;
@@ -48,17 +61,23 @@ update_status ModuleEditor::PreUpdate()
     return ret;
 }
 
+/**
+ * Updates the editor module each frame.
+ *
+ * @return The current update status.
+ */
 update_status ModuleEditor::Update()
 {
     update_status ret = UPDATE_CONTINUE;
-    //ImGui::ShowDemoWindow();
+
+    //MENU BAR
     ImGui::BeginMainMenuBar();
     if (ImGui::BeginMenu("Help")) {
         if (ImGui::MenuItem("Gui Demo")){
             showcase = !showcase;
         }
         if (ImGui::MenuItem("Documentation")) {
-            App->RequestBrowser("https://github.com/PabioGF");
+            App->RequestBrowser("https://github.com/PabioGF/Engine");
         }
         if (ImGui::MenuItem("About...")) 
         {
@@ -70,6 +89,7 @@ update_status ModuleEditor::Update()
 
     if (show_about_window)
     {
+        //ABOUT WINDOW
         if (ImGui::Begin("About", &show_about_window, ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text("Name:");
@@ -108,6 +128,8 @@ update_status ModuleEditor::Update()
 
     }
     if (showWindows) {
+
+        //CONSOLE
         ImGui::Begin("Console");
         if (logBuffer && !logBuffer->empty()) {
             for (const auto& log : *logBuffer) {
@@ -119,8 +141,14 @@ update_status ModuleEditor::Update()
             }
         }
         ImGui::End();
+
+        //CALCULATES FPS
         FpsGraph();
+
+        //SYSTEM INFORMATION
         ShowSystemInfoWindow();
+
+        //MENU FOR THE CONFIGURATIONS
         ConfigurationsMenu();
         
     }
@@ -132,7 +160,11 @@ update_status ModuleEditor::Update()
     return ret;
 }
 
-
+/**
+ * Cleans up ImGui and OpenGL resources.
+ *
+ * @return true if cleanup was successful.
+ */
 bool ModuleEditor::CleanUp()
 {
     ImGui_ImplOpenGL3_Shutdown();
@@ -141,6 +173,9 @@ bool ModuleEditor::CleanUp()
     return true;
 }
 
+/**
+ * Updates FPS.
+ */
 void ModuleEditor::FpsGraph() {
     float prev_delta = delta_time;
     delta_time = clock() / CLOCKS_PER_SEC;
@@ -152,7 +187,6 @@ void ModuleEditor::FpsGraph() {
 
         fps_counter = 0;
 
-
         if (fps_log.size() > log_size)
             fps_log.erase(fps_log.begin());
         if (ms_log.size() > log_size)
@@ -160,10 +194,11 @@ void ModuleEditor::FpsGraph() {
         
     }
 
-
-
 }
 
+/**
+ * Displays model and texture information.
+ */
 void ModuleEditor::ModelInformation(const std::vector<std::string>& modelInfo, const std::vector<std::string>& textureInfo) {
     if (showWindows) {
         ImGui::Begin("Model Information");
@@ -189,7 +224,9 @@ void ModuleEditor::ModelInformation(const std::vector<std::string>& modelInfo, c
 
 }
 
-
+/**
+ * Displays system information like memory usage, CPU, GPU, etc.
+ */
 void ModuleEditor::ShowSystemInfoWindow() {
     ImGui::Begin("System Information");
 
@@ -207,7 +244,6 @@ void ModuleEditor::ShowSystemInfoWindow() {
 
     ImGui::Separator();
 
-    // Memory Consumption (example using dummy data, replace with actual system query)
     ImGui::Text("Memory Consumption");
     size_t total_memory = 0, used_memory = 0;
     GetMemoryInfo(total_memory, used_memory);
@@ -216,7 +252,6 @@ void ModuleEditor::ShowSystemInfoWindow() {
 
     ImGui::Separator();
 
-    // Hardware Detection
     ImGui::Text("Hardware");
     ImGui::Text("CPU Cores: %d", SDL_GetCPUCount());
     ImGui::Text("RAM: %d MB", SDL_GetSystemRAM());
@@ -225,7 +260,6 @@ void ModuleEditor::ShowSystemInfoWindow() {
 
     ImGui::Separator();
 
-    // Software Versions
     ImGui::Text("Software");
     ImGui::Text("SDL Version: %d.%d.%d", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL);
     ImGui::Text("OpenGL Version: %s", (const char*)glGetString(GL_VERSION));
@@ -236,6 +270,12 @@ void ModuleEditor::ShowSystemInfoWindow() {
     ImGui::End();
 }
 
+/**
+ * Retrieves the system's total and used memory.
+ *
+ * @param total_memory Reference to store the total physical memory in bytes.
+ * @param used_memory Reference to store the used physical memory in bytes.
+ */
 void ModuleEditor::GetMemoryInfo(size_t& total_memory, size_t& used_memory) {
     MEMORYSTATUSEX memInfo;
     memInfo.dwLength = sizeof(MEMORYSTATUSEX);
@@ -245,14 +285,15 @@ void ModuleEditor::GetMemoryInfo(size_t& total_memory, size_t& used_memory) {
     used_memory = (memInfo.ullTotalPhys - memInfo.ullAvailPhys);
 }
 
+/**
+ * Displays and manages the configuration menu settings.
+ */
 void ModuleEditor::ConfigurationsMenu() {
     static GLint wrap_mode_s = GL_REPEAT;  
     static GLint wrap_mode_t = GL_REPEAT;  
     static GLint mag_filter = GL_LINEAR;
     static GLint min_filter = GL_LINEAR;
     static bool mipmaps_enabled = true;
-    static int window_width = App->GetWindow()->width; 
-    static int window_height = App->GetWindow()->height;
     static int scale_factor = App->GetCamera()->scalefactor;
     static int initial_scale = App->GetCamera()->scalefactor;
 
@@ -297,7 +338,7 @@ void ModuleEditor::ConfigurationsMenu() {
     }
 
     if (ImGui::CollapsingHeader("Model settings")) {
-        if (ImGui::SliderInt("Scale", &scale_factor, initial_scale, initial_scale+50)) {
+        if (ImGui::SliderInt("Scale", &scale_factor, 0, initial_scale+50)) {
             App->GetCamera()->scalefactor = scale_factor;
         }
     }

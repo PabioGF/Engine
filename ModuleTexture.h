@@ -16,12 +16,6 @@ public:
 
 	// Destructor
 	virtual ~ModuleTexture();
-
-	// Called before quitting
-	bool Init();
-	update_status PreUpdate();
-	update_status Update();
-	bool CleanUp();
 	
 	DirectX::ScratchImage LoadTexture(const std::string& file_path);
 	unsigned int CreateTexture(const DirectX::ScratchImage& scratch_image);
