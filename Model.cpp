@@ -109,7 +109,7 @@ void Model::LoadMaterials(const tinygltf::Model& srcModel) {
             if (texture.source >= 0 && texture.source < srcModel.images.size()) {
                 const tinygltf::Image& image = srcModel.images[texture.source];
 
-                DirectX::ScratchImage scratch_image = App->GetTexture()->LoadTexture(image.uri);
+                DirectX::ScratchImage scratch_image = App->GetTexture()->LoadTexture("Textures/"+image.uri);
                 textureId = App->GetTexture()->CreateTexture(scratch_image);
 
                 scratch_image.Release();

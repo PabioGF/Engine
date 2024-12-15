@@ -27,25 +27,6 @@ ModuleOpenGL::~ModuleOpenGL()
 {
 }
 
-/**
- * Loads the license text from a file.
- *
- * @param file_path The file path to the license file.
- * @return The content of the license file as a string.
- */
-std::string LoadLicense(const std::string& file_path)
-{
-	std::ifstream file(file_path);
-	if (!file.is_open())
-	{
-		LOG("Error: Could not open license file at %s", file_path.c_str());
-		return "License file not found.";
-	}
-
-	std::stringstream buffer;
-	buffer << file.rdbuf();
-	return buffer.str();
-}
 
 /**
  * Initializes the OpenGL module.
@@ -180,5 +161,25 @@ void ModuleOpenGL::EnableParameters(bool& depth_test, bool& cull_face) {
 	}
 	
 	
+}
+
+/**
+ * Loads the license text from a file.
+ *
+ * @param file_path The file path to the license file.
+ * @return The content of the license file as a string.
+ */
+std::string ModuleOpenGL::LoadLicense(const std::string& file_path)
+{
+	std::ifstream file(file_path);
+	if (!file.is_open())
+	{
+		LOG("Error: Could not open license file at %s", file_path.c_str());
+		return "License file not found.";
+	}
+
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	return buffer.str();
 }
 

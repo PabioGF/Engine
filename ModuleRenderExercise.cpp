@@ -43,7 +43,7 @@ bool ModuleRenderExercise::Init()
 {
     bool ret = true;
 
-    model->Load("BakerHouse.gltf");
+    model->Load("Textures/BakerHouse.gltf");
     AABB modelAABB = model->CalculateAABB();
     App->GetCamera()->aabbModel = modelAABB;
     
