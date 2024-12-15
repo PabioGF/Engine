@@ -9,7 +9,6 @@
 #include "SDL.h"
 #include "MathGeoLib.h"
 
-
 /**
  * Constructor for the ModuleCamera class. Initializes the frustum and sets default values.
  */
