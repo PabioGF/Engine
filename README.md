@@ -1,4 +1,4 @@
-# **Short Description*
+# **Short Description**
 Engine made for the UPC Master Advanced Programming for AAA Video Games.
 
 # **Github**
